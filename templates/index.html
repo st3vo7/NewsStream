@@ -1,0 +1,41 @@
+{% extends "main.html" %}
+
+
+{% block body %}
+
+    <form method="POST">
+        <h3> Izaberi izvor: </h3>
+        <fieldset id="group1">
+            <input type="radio" name="drzava" value="rs" checked> Srbija <br>
+            <input type="radio" name="drzava" value="gb" > Velika Britanija <br>
+            <input type="radio" name="drzava" value="us" > SAD <br>
+        </fieldset>
+        
+    
+    
+        <h3> Izaberi kategoriju: </h3>
+        <fieldset id="group2">
+            <input type="radio" name="kategorija" value="business" checked> Biznis <br>
+            <input type="radio" name="kategorija" value="entertainment" > Zabava <br>
+            <input type="radio" name="kategorija" value="general" > Uopste <br>
+            <input type="radio" name="kategorija" value="health" > Zdravlje <br>
+            <input type="radio" name="kategorija" value="science" > Nauka <br>
+            <input type="radio" name="kategorija" value="sports" > Sport <br>
+            <input type="radio" name="kategorija" value="technology" > Tehnologija <br>
+        </fieldset>
+        
+        <input type="submit" value="Posalji">
+    </form>
+
+
+    <h2> Naslovi: </h2>
+    <p> {{ zemlja }} - {{ kat }} </p>
+    <ul>
+        {% for item in naslovi1 %}
+            <li> {{ item }} </li>
+        {% end %}
+    </ul>
+    
+    
+{% end %}
+

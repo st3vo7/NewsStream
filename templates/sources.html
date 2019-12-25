@@ -1,0 +1,26 @@
+{% extends "main.html" %}
+
+
+{% block body %}
+
+<form method="POST">
+    <h3> Izaberi drzavu: </h3>
+        <fieldset id="group1">
+            <input type="radio" name="drzava" value="gb" checked> Velika Britanija <br>
+            <input type="radio" name="drzava" value="ru" > Rusija <br>
+            <input type="radio" name="drzava" value="us" > SAD <br>
+        </fieldset>
+        
+    <input type="submit" value="Posalji">
+
+</form>
+
+
+<h3> Izvori: </h3>
+    <ul>
+        {% for item in izvori1 %}
+            <li> {{ item }} </li>
+        {% end %}
+    </ul>
+
+{% end %}
