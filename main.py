@@ -13,7 +13,7 @@ url1 = ( 'https://newsapi.org/v2/top-headlines?'
         'country=rs&'
         #'category=technology&'
         #'q=bomba&'
-        'apiKey=')
+        'apiKey=17060bbc869845deb9246555cd6f8e5d')
 
 
 url3 = ( 'https://newsapi.org/v2/sources?'
@@ -21,7 +21,7 @@ url3 = ( 'https://newsapi.org/v2/sources?'
         'country=gb&'
         #'category=technology&'
         #'q=manchester city&'
-        'apiKey=')
+        'apiKey=17060bbc869845deb9246555cd6f8e5d')
 
 
 from tornado.options import define, options
@@ -48,8 +48,6 @@ class SourceHandler(tornado.web.RequestHandler):
                     izvori1.append(items3[index][key] + ' - ' + items3[index]['description'])
         
         
-        
-        
         self.render("sources.html",
                     izvori1=izvori1
                     )
@@ -62,9 +60,11 @@ class SourceHandler(tornado.web.RequestHandler):
         
         if self.get_argument("btn1",None) != None:
             self.redirect("/")
+            return
         
         if self.get_argument("btn2",None) != None:
             self.redirect("/sources")
+            return
             
         a=self.get_argument("drzava",None)
         #print(a)
@@ -74,7 +74,7 @@ class SourceHandler(tornado.web.RequestHandler):
                 'country='+a+'&'
                 #'category=technology&'
                 #'q=manchester city&'
-                'apiKey=')
+                'apiKey=17060bbc869845deb9246555cd6f8e5d')
         
         response3 = requests.get(url)
         podaci3 = response3.json()
@@ -103,8 +103,6 @@ class MainHandler(tornado.web.RequestHandler):
         naslovi1 = []
         #naslovi2 = []
         
-        
-        
         response1 = requests.get(url1)
         podaci1 = response1.json()
         #print(json.dumps(podaci1, indent=1))
@@ -128,35 +126,38 @@ class MainHandler(tornado.web.RequestHandler):
                     naslovi1.append(items1[index][key])
         
         
-        
-        
-        
+         
         self.render("index.html",
                     naslovi1=naslovi1,
                     zemlja = "rs",
-                    kat = "all")
+                    kat = "general")
         
     def post(self):
-        
+
+        print('u postu sam')
         if self.get_argument("btn2",None) != None:
             self.redirect("/sources")
+            return
+        print('prosao redirect na sauces')
        
         if self.get_argument("btn1",None) != None:
             self.redirect("/")
+            return
+
+        print('prosao redirect na home')
        
         
-        a=self.get_argument("drzava",None)
+        a=self.get_argument("drzava", None)
         b=self.get_argument("kategorija",None)
+        print(a)
         print(b)
-        
-        #print(a)
         
         url = ( 'https://newsapi.org/v2/top-headlines?'
                 'country='+a+'&'
                 'category='+b+'&'
                 #'q=bomba&'
-                'apiKey=')
-        #print(url)
+                'apiKey=17060bbc869845deb9246555cd6f8e5d')
+        print(url)
 
         
         naslovi1 = []
@@ -185,11 +186,6 @@ class MainHandler(tornado.web.RequestHandler):
                     kat = b,
                     )
         
-        
-        
-        
-            
-        
 
 if __name__ == '__main__':
     tornado.options.parse_command_line()
@@ -198,6 +194,7 @@ if __name__ == '__main__':
                   (r'/sources', SourceHandler),
                   ],
         template_path=os.path.join(os.path.dirname(__file__),"templates"),
+        static_path = os.path.join(os.path.dirname(__file__),"static"),
         debug=True
     )
     http_server=tornado.httpserver.HTTPServer(app)
