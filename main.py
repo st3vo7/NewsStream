@@ -7,6 +7,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+import tornado.escape
 
 
 url1 = ( 'https://newsapi.org/v2/top-headlines?'
@@ -145,12 +146,50 @@ class MainHandler(tornado.web.RequestHandler):
             return
 
         print('prosao redirect na home')
-       
+
+        print(self.request.body)
+        print('---'*25)
+        dic_data = tornado.escape.json_decode(self.request.body)
+        print(dic_data)
+
+        '''
+        upit = self.request.body.decode("utf-8")
+        print('+++'*20)
+        print(upit)
+        print('+++'*20)
         
+        
+        argumenti = self.request.arguments
+        print(argumenti)
+        print('---'*20)
+        drzava_val = argumenti['country'][0].decode("utf-8") 
+        print(drzava_val)
+        kategorija_val =  argumenti['kategorija'][0].decode("utf-8")
+        print(kategorija_val)
+
+        primljen = {
+            'country1': drzava_val,
+            'kategorija': kategorija_val
+        }
+
+        print(primljen)
+        '''
+
+
+        a=dic_data['country']
+        b=dic_data['category']
+        
+
+        '''
         a=self.get_argument("drzava", None)
         b=self.get_argument("kategorija",None)
+        
+
+
+        '''
         print(a)
         print(b)
+        
         
         url = ( 'https://newsapi.org/v2/top-headlines?'
                 'country='+a+'&'
@@ -173,11 +212,15 @@ class MainHandler(tornado.web.RequestHandler):
         
         print(status1)
         
+        
         items1 = podaci1['articles']
         for index in range(len(items1)):
             for key in items1[index]:
                 if key == 'title':
                     naslovi1.append(items1[index][key])
+
+        #umesto da renderujem celu stranu, vraticu ajaxu podatke, i on ce da mi izgenerise naslove
+                
         
         
         self.render("index.html",
@@ -185,6 +228,8 @@ class MainHandler(tornado.web.RequestHandler):
                     zemlja = a,
                     kat = b,
                     )
+        print('dosli smo do kraja puta')
+        
         
 
 if __name__ == '__main__':
@@ -193,7 +238,7 @@ if __name__ == '__main__':
         handlers=[(r'/',MainHandler),
                   (r'/sources', SourceHandler),
                   ],
-        template_path=os.path.join(os.path.dirname(__file__),"templates"),
+        template_path = os.path.join(os.path.dirname(__file__),"templates"),
         static_path = os.path.join(os.path.dirname(__file__),"static"),
         debug=True
     )
