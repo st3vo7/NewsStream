@@ -1,6 +1,7 @@
 import os.path
 import requests
 import json
+import pprint
 
 
 import tornado.httpserver
@@ -129,9 +130,7 @@ class MainHandler(tornado.web.RequestHandler):
         
          
         self.render("index.html",
-                    naslovi1=naslovi1,
-                    zemlja = "rs",
-                    kat = "general")
+                    )
         
     def post(self):
 
@@ -147,10 +146,10 @@ class MainHandler(tornado.web.RequestHandler):
 
         print('prosao redirect na home')
 
-        print(self.request.body)
-        print('---'*25)
+        print('---'*26)
         dic_data = tornado.escape.json_decode(self.request.body)
         print(dic_data)
+        print('---'*26)
 
         '''
         upit = self.request.body.decode("utf-8")
@@ -163,16 +162,12 @@ class MainHandler(tornado.web.RequestHandler):
         print(argumenti)
         print('---'*20)
         drzava_val = argumenti['country'][0].decode("utf-8") 
-        print(drzava_val)
         kategorija_val =  argumenti['kategorija'][0].decode("utf-8")
-        print(kategorija_val)
 
         primljen = {
             'country1': drzava_val,
             'kategorija': kategorija_val
         }
-
-        print(primljen)
         '''
 
 
@@ -183,13 +178,9 @@ class MainHandler(tornado.web.RequestHandler):
         '''
         a=self.get_argument("drzava", None)
         b=self.get_argument("kategorija",None)
-        
-
-
-        '''
         print(a)
         print(b)
-        
+        '''
         
         url = ( 'https://newsapi.org/v2/top-headlines?'
                 'country='+a+'&'
@@ -202,6 +193,9 @@ class MainHandler(tornado.web.RequestHandler):
         naslovi1 = []
         response1 = requests.get(url)
         podaci1 = response1.json()
+        pprint.pprint(podaci1)
+
+
         status1 = podaci1['status']
         
         if status1=='error':
@@ -209,10 +203,10 @@ class MainHandler(tornado.web.RequestHandler):
             print(podaci1['code'])
             print(podaci1['message'])
         
+
+        #print('status:', status1)
         
-        print(status1)
-        
-        
+        '''
         items1 = podaci1['articles']
         for index in range(len(items1)):
             for key in items1[index]:
@@ -220,14 +214,22 @@ class MainHandler(tornado.web.RequestHandler):
                     naslovi1.append(items1[index][key])
 
         #umesto da renderujem celu stranu, vraticu ajaxu podatke, i on ce da mi izgenerise naslove
-                
-        
-        
+        self.write(json.dumps({'status': status1, 'sent': naslovi1}))
+        '''
+
+        self.write(json.dumps({'sent': podaci1}))
+
+
+
+        '''
+        #stari nacin, pre ajaksa
         self.render("index.html",
                     naslovi1=naslovi1,
                     zemlja = a,
                     kat = b,
                     )
+        '''
+
         print('dosli smo do kraja puta')
         
         

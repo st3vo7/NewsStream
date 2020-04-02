@@ -4,37 +4,40 @@
 {% block body %}
 
 <form method="POST">
-    <h3> Izaberi izvor: </h3>
+    <h3> Choose country: </h3>
     <fieldset id="group1">
-        <input type="radio" name="country" value="rs" checked> Srbija <br>
-        <input type="radio" name="country" value="gb"> Velika Britanija <br>
-        <input type="radio" name="country" value="us"> SAD <br>
+        <input type="radio" name="country" value="rs" class="radio" checked> Serbia <br>
+        <input type="radio" name="country" value="gb" class="radio"> Great Britain <br>
+        <input type="radio" name="country" value="us" class="radio"> United States of America <br>
     </fieldset>
 
 
 
-    <h3> Izaberi kategoriju: </h3>
+    <h3> Choose category: </h3>
     <fieldset id="group2">
-        <input type="radio" name="category" value="general" checked> Uopste <br>
-        <input type="radio" name="category" value="entertainment"> Zabava <br>
-        <input type="radio" name="category" value="business"> Biznis <br>
-        <input type="radio" name="category" value="health"> Zdravlje <br>
-        <input type="radio" name="category" value="science"> Nauka <br>
-        <input type="radio" name="category" value="sports"> Sport <br>
-        <input type="radio" name="category" value="technology"> Tehnologija <br>
+        <input type="radio" name="category" value="general" class="radio" checked> General <br>
+        <input type="radio" name="category" value="entertainment" class="radio"> Entertainment <br>
+        <input type="radio" name="category" value="business" class="radio"> Business <br>
+        <input type="radio" name="category" value="health" class="radio"> Health <br>
+        <input type="radio" name="category" value="science" class="radio"> Science <br>
+        <input type="radio" name="category" value="sports" class="radio"> Sports <br>
+        <input type="radio" name="category" value="technology" class="radio"> Tehnologija <br>
     </fieldset>
     <br>
     <input id="btnSend" type="submit" class="btn" value="Send">
 </form>
 
+<div id="ajax_headlines">
+    <h2 id="ajax_title" class="sakrij">Top headlines:</h2>
+    <div class="container sakrij" id="panel_top_headlines">
+    </div>
 
-<h2> Naslovi: </h2>
-<p> {{ zemlja }} - {{ kat }} </p>
-<ul>
-    {% for item in naslovi1 %}
-    <li> {{ item }} </li>
-    {% end %}
-</ul>
+    <ul id="ajax_headlines_list">
+    </ul>
+</div>
+
+<br>
+
 
 
 {% end %}
