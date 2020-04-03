@@ -4,6 +4,11 @@ $(function () {
 
   var obj;
 
+  function izvuci_broj(data) {
+
+    return data.split('_')[1];
+  }
+
   $('#btnSend').on('click', function (e) {
     //alert('kliknuto na btnSend');
 
@@ -54,9 +59,9 @@ $(function () {
     var articles = obj.sent.articles;
     //console.log(articles);
 
-    var link = articles[0].url;
+    //var link = articles[0].url;
     //console.log(link);
-    var slika = articles[0].urlToImage;
+    //var slika = articles[0].urlToImage;
     //console.log(slika);
 
     /*
@@ -69,7 +74,7 @@ $(function () {
     $list_for_headlines.hide(300, function () {
       $list_for_headlines.empty();
       $.each(articles, function (i, article) {
-        $list_for_headlines.append('<li id="list_title_' + i + '" class="listica"><a class="naslov">' + article.title + '<br></a></li>');
+        $list_for_headlines.append('<li id="list-title_' + i + '" class="listica"><a class="naslov">' + article.title + '<br></a></li>');
       });
       $list_for_headlines.show(300);
     });
@@ -85,31 +90,51 @@ $(function () {
     var articles = obj.sent.articles;
     //alert(articles[0].title);
     console.log(articles);
-    console.log(articles[0].title);
+    //console.log(articles[0].title);
 
-    var $id_kliknute = $(this).closest('li')[0].id
+    //var $id_kliknute = $(this).closest('li')[0].id
     //alert($id_kliknute);
     //$(this).fadeOut(500);
     $kliknuta_lista = $(this);
 
     //vest se vraca samo na naslov kada se klikne na drugu
     $kliknuta_lista.closest('li').siblings(".prosiren").slideUp(300, function () {
-      var id_vesti = $(this)[0].id.substr($(this)[0].id.length - 1);
+      var id_vesti = izvuci_broj($(this)[0].id);
       var tekst_koji_ostaje = articles[id_vesti].title;
 
       $(this).html('<a class="naslov">' + tekst_koji_ostaje + '<br></a>').slideDown(300);
       $(this).removeClass('prosiren');
     });
 
-    $(this).slideUp(300, function () {
-      //$kliknuta_lista.empty();
-      $kliknuta_lista.addClass('prosiren');
-      var id_vesti = $kliknuta_lista[0].id.substr($kliknuta_lista[0].id.length - 1);
-      //alert(id_vesti);
+    if ($kliknuta_lista.attr("class").includes('prosiren')) {
+      //to znaci da je vest otvorena i treba je zatvoriti
+      //alert('kliknuo na otvorenu vest');
+      $kliknuta_lista.closest('li').slideUp(300, function () {
+        var id_vesti = izvuci_broj($(this)[0].id);
+        var tekst_koji_ostaje = articles[id_vesti].title;
 
-      $(this).append('<div class="container"><img src="' + articles[id_vesti].urlToImage + '" class="img"</div>')
-        .append('<p>' + articles[id_vesti].description + '</p>').slideDown(300);
-    });
+        $(this).html('<a class="naslov">' + tekst_koji_ostaje + '<br></a>').slideDown(300);
+        $(this).removeClass('prosiren');
+      });
+
+
+    }
+
+    else {
+
+      //vest nije prosirena i treba je prosiriti
+      $(this).slideUp(300, function () {
+        //$kliknuta_lista.empty();
+        $kliknuta_lista.addClass('prosiren');
+        var id_vesti = izvuci_broj($kliknuta_lista[0].id);
+        //alert(id_vesti);
+
+        $(this).append('<div class="container"><img src="' + articles[id_vesti].urlToImage + '" class="img"</div>')
+          .append('<p>' + articles[id_vesti].description + '</p>')
+          .append('<a href="'+articles[id_vesti].url+'"target="_blank" class="zatamni"> Read more... </a>')
+          .slideDown(300);
+      });
+    }
 
   });
 
