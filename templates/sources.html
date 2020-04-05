@@ -4,23 +4,23 @@
 {% block body %}
 
 <form method="POST">
-    <h3> Izaberi drzavu: </h3>
-        <fieldset id="group1">
-            <input type="radio" name="drzava" value="gb" checked> Velika Britanija <br>
-            <input type="radio" name="drzava" value="ru" > Rusija <br>
-            <input type="radio" name="drzava" value="us" > SAD <br>
-        </fieldset>
-        
-    <input type="submit" class="btn" value="Send">
+    <h3> Choose a country: </h3>
+    <fieldset id="group1">
+        <input type="radio" name="drzava" value="gb" checked> Great Britain <br>
+        <input type="radio" name="drzava" value="ru"> Russia <br>
+        <input type="radio" name="drzava" value="us"> United States of America <br>
+    </fieldset>
+    <br>
+
+    <input id="btnSources" type="submit" class="btn" value="Send">
 
 </form>
 
+<div id="sauces_list">
+    <h2 id="sauces_title" class="sakrij"> Sources: </h3>
+    <ul id="ajax_sauces_list">
 
-<h3> Izvori: </h3>
-    <ul>
-        {% for item in izvori1 %}
-            <li> {{ item }} </li>
-        {% end %}
     </ul>
+</div>
 
 {% end %}

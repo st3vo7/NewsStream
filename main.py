@@ -31,6 +31,9 @@ define("port",default=8000, help="run on the given port", type=int)
 
 class SourceHandler(tornado.web.RequestHandler):
     def get(self):
+
+        '''
+        print('u getu sam')
         
         izvori1 = []
         
@@ -49,28 +52,38 @@ class SourceHandler(tornado.web.RequestHandler):
                 if key == 'name':
                     izvori1.append(items3[index][key] + ' - ' + items3[index]['description'])
         
+        '''
+
         
         self.render("sources.html",
-                    izvori1=izvori1
                     )
         
         
     def post(self):
-        
+        print('u postu sam')
         izvori1 = []
         
         
         if self.get_argument("btn1",None) != None:
             self.redirect("/")
             return
+        print('prosao redirect na home')
         
         if self.get_argument("btn2",None) != None:
             self.redirect("/sources")
             return
+        print('prosao redirect na sources')
             
-        a=self.get_argument("drzava",None)
+        #a=self.get_argument("drzava",None)
         #print(a)
+
+        print('---'*26)
+        a = tornado.escape.json_decode(self.request.body)
+        print(a)
+        print('---'*26)
         
+
+       
         url = ( 'https://newsapi.org/v2/sources?'
                 #'language=en&'
                 'country='+a+'&'
@@ -80,12 +93,18 @@ class SourceHandler(tornado.web.RequestHandler):
         
         response3 = requests.get(url)
         podaci3 = response3.json()
+        print(json.dumps(podaci3, indent=1))
         
         status3 = podaci3['status']
-        print(status3)
+        #print(status3)
+        if status3=='error':
+            print(status3)
+            print(podaci3['code'])
+            print(podaci3['message'])
+
+        self.write(json.dumps({'sent': podaci3}))
         
-        #print(json.dumps(podaci3, indent=1))
-        
+        '''
         items3 = podaci3['sources']
         for index in range(len(items3)):
             for key in items3[index]:
@@ -97,7 +116,7 @@ class SourceHandler(tornado.web.RequestHandler):
         self.render("sources.html",
                     izvori1=izvori1
                     )
-
+        '''
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):

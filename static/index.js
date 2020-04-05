@@ -9,6 +9,30 @@ $(function () {
     return data.split('_')[1];
   }
 
+  $('#btnSources').on('click', function (e) {
+    //alert('kliknuto na btnSauce');
+    e.preventDefault();
+
+    var $country = $('#group1 :checked');
+    //alert($country.val());
+
+    $.ajax({
+      type: 'POST',
+      url: 'http://localhost:8000/sources',
+      data: JSON.stringify($country.val()),
+      contentType: "json",
+      success: data_ok_sources,
+      error: function () {
+        alert('greska');
+      }
+    });
+
+
+  });
+
+
+
+
   $('#btnSend').on('click', function (e) {
     //alert('kliknuto na btnSend');
 
@@ -45,7 +69,32 @@ $(function () {
     //ode ga umetni...................
   });
 
+  function data_ok_sources(data) {
+
+
+    var $list_for_sauces = $('#ajax_sauces_list');
+    var $sauces_title = $('#sauces_title');
+
+    obj = JSON.parse(data);
+    console.log(obj);
+    var sources = obj.sent.sources;
+    console.log(sources);
+
+    $list_for_sauces.hide(300, function(){
+      $list_for_sauces.empty();
+      $.each(sources, function(i,source){
+        $list_for_sauces.append('<li id="list-sauce_'+i+'"><a class="naslov">'+source.name+'</a>:<p>'+source.description+'</p></li>');
+      });
+      $list_for_sauces.show(300);
+    });
+
+    $sauces_title.show(300);
+
+  }
+
+
   function data_ok(data) {
+
 
     var $list_for_headlines = $('#ajax_headlines_list');
     var $headline_title = $('#ajax_title');
@@ -57,19 +106,6 @@ $(function () {
 
 
     var articles = obj.sent.articles;
-    //console.log(articles);
-
-    //var link = articles[0].url;
-    //console.log(link);
-    //var slika = articles[0].urlToImage;
-    //console.log(slika);
-
-    /*
-    $headlines_panel.empty();
-    $headlines_panel.append('<a href="' + link + '" target="_blank">' + '<img src="' + slika + '">' + '</a>');
-    $headlines_panel.append('<a href="' + link + '" target="_blank"><div class="centered zatamni"><h5>' + articles[0].title + '</h5></div></a>');
-    */
-
 
     $list_for_headlines.hide(300, function () {
       $list_for_headlines.empty();
@@ -131,7 +167,7 @@ $(function () {
 
         $(this).append('<div class="container"><img src="' + articles[id_vesti].urlToImage + '" class="img"</div>')
           .append('<p>' + articles[id_vesti].description + '</p>')
-          .append('<a href="'+articles[id_vesti].url+'"target="_blank" class="zatamni"> Read more... </a>')
+          .append('<a href="' + articles[id_vesti].url + '"target="_blank" class="zatamni"> Read more... </a>')
           .slideDown(300);
       });
     }
