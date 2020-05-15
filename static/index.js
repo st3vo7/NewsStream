@@ -3,6 +3,7 @@ $(function () {
   //console.log('1');
 
   var obj;
+  var initial_request;
 
   function izvuci_broj(data) {
 
@@ -31,8 +32,7 @@ $(function () {
   });
 
 
-
-
+  
   $('#btnSend').on('click', function (e) {
     //alert('kliknuto na btnSend');
 
@@ -42,9 +42,12 @@ $(function () {
     var $country = $('#group1 :checked');
     var $category = $('#group2 :checked');
 
+    
+
     var package = {
       country: $country.val(),
-      category: $category.val()
+      category: $category.val(),
+      initial_request : true
     };
     //alert(JSON.stringify(package));
 
@@ -100,6 +103,9 @@ $(function () {
     var $headline_title = $('#ajax_title');
     //var $headlines_panel = $('#panel_top_headlines');
 
+    initial_request = false;
+    alert(initial_request);
+
     //console.log(data);
     obj = JSON.parse(data);
     //console.log(obj);
@@ -117,6 +123,10 @@ $(function () {
 
     $headline_title.show(300);
 
+    /* 
+    ponovo salji zahtev
+    window.setTimeout(send_request, 0);
+ */
   }
   //ode ga umetni......................
 
