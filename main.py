@@ -150,8 +150,8 @@ class MainHandler(tornado.web.RequestHandler):
             response1 = await http_client.fetch(url)
         except Exception as e:
             print("An error occurred: %s" % e)
-        else:
-            print(response1.body)
+        #else:
+            #print(response1.body)
 
         #response1 = requests.get(url)
         #podaci1 = response1.json()

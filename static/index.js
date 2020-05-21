@@ -4,6 +4,9 @@ $(function () {
 
   var obj;
   var initial_request;
+  var errorSleepTime = 500;
+  var sending_parameters;
+
 
   function izvuci_broj(data) {
 
@@ -42,14 +45,22 @@ $(function () {
     var $country = $('#group1 :checked');
     var $category = $('#group2 :checked');
 
-    
 
     var package = {
       country: $country.val(),
       category: $category.val(),
-      initial_request : true
+      
     };
-    //alert(JSON.stringify(package));
+    
+
+    //da bih mogao da ga koristim ponovo u data_ok, jer package nije vidljiv van ove f-je
+    sending_parameters = package;
+
+    package.initial_request = true;
+
+    alert(JSON.stringify(package));
+
+    
 
     /* $('#ajax_headlines_list').slideUp(300, function(){
       $(this).empty();
@@ -57,7 +68,7 @@ $(function () {
 
 
     //sada ove podatke treba poslati jednim ajax POST metodom serveru
-    $.ajax({
+    /* $.ajax({
       type: 'POST',
       url: 'http://localhost:8000',
       data: JSON.stringify(package),
@@ -66,11 +77,35 @@ $(function () {
       error: function () {
         alert('greska');
       }
-    });
+    }); */
+
+    post_ajax('http://localhost:8000',JSON.stringify(package));
 
 
     //ode ga umetni...................
   });
+
+
+  function post_ajax(url, data){
+
+    $.ajax({
+      type: 'POST',
+      url: url,
+      data: data,
+      contentType: "json",
+      success: data_ok,
+      error: data_not_ok
+    });
+
+  }
+
+  //ovo za sada ne radi kako treba, tj. non stop salje zahtev, ne ceka nimalo
+  function data_not_ok(){  
+      errorSleepTime *= 2;
+      console.log(errorSleepTime)
+      console.log(sending_parameters.initial_request)
+      window.setTimeout(post_ajax('http://localhost:8000', JSON.stringify(sending_parameters)), errorSleepTime);
+  }
 
   function data_ok_sources(data) {
 
@@ -104,8 +139,10 @@ $(function () {
     //var $headlines_panel = $('#panel_top_headlines');
 
     initial_request = false;
-    alert(initial_request);
+    //alert(initial_request);
 
+    errorSleepTime = 500;
+    
     //console.log(data);
     obj = JSON.parse(data);
     //console.log(obj);
@@ -123,10 +160,14 @@ $(function () {
 
     $headline_title.show(300);
 
-    /* 
-    ponovo salji zahtev
-    window.setTimeout(send_request, 0);
- */
+     
+    //ponovo salji zahtev
+    sending_parameters.initial_request = false;
+    alert(JSON.stringify(sending_parameters));
+    
+    window.setTimeout(post_ajax('http://localhost:8000',JSON.stringify(sending_parameters)), 0);
+    console.log(JSON.stringify(sending_parameters))
+ 
   }
   //ode ga umetni......................
 
