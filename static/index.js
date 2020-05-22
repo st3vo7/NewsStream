@@ -13,6 +13,7 @@ $(function () {
     return data.split('_')[1];
   }
 
+
   $('#btnSources').on('click', function (e) {
     //alert('kliknuto na btnSauce');
     e.preventDefault();
@@ -35,7 +36,7 @@ $(function () {
   });
 
 
-  
+
   $('#btnSend').on('click', function (e) {
     //alert('kliknuto na btnSend');
 
@@ -49,25 +50,21 @@ $(function () {
     var package = {
       country: $country.val(),
       category: $category.val(),
-      
+
     };
-    
+
 
     //da bih mogao da ga koristim ponovo u data_ok, jer package nije vidljiv van ove f-je
     sending_parameters = package;
 
     package.initial_request = true;
 
-    alert(JSON.stringify(package));
+    //alert(JSON.stringify(package));
 
-    
-
-    /* $('#ajax_headlines_list').slideUp(300, function(){
-      $(this).empty();
-    }); */
 
 
     //sada ove podatke treba poslati jednim ajax POST metodom serveru
+
     /* $.ajax({
       type: 'POST',
       url: 'http://localhost:8000',
@@ -79,33 +76,27 @@ $(function () {
       }
     }); */
 
-    post_ajax('http://localhost:8000',JSON.stringify(package));
+    post_ajax('http://localhost:8000', JSON.stringify(package), data_ok, data_not_ok);
 
 
     //ode ga umetni...................
   });
 
 
-  function post_ajax(url, data){
+  function post_ajax(url, data, success_function, failure_function) {
 
     $.ajax({
       type: 'POST',
       url: url,
       data: data,
       contentType: "json",
-      success: data_ok,
-      error: data_not_ok
+      success: success_function,
+      error: failure_function
     });
 
   }
 
-  //ovo za sada ne radi kako treba, tj. non stop salje zahtev, ne ceka nimalo
-  function data_not_ok(){  
-      errorSleepTime *= 2;
-      console.log(errorSleepTime)
-      console.log(sending_parameters.initial_request)
-      window.setTimeout(post_ajax('http://localhost:8000', JSON.stringify(sending_parameters)), errorSleepTime);
-  }
+
 
   function data_ok_sources(data) {
 
@@ -118,16 +109,25 @@ $(function () {
     var sources = obj.sent.sources;
     console.log(sources);
 
-    $list_for_sauces.hide(300, function(){
+    $list_for_sauces.hide(300, function () {
       $list_for_sauces.empty();
-      $.each(sources, function(i,source){
-        $list_for_sauces.append('<li id="list-sauce_'+i+'"><a class="naslov">'+source.name+'</a>:<p>'+source.description+'</p></li>');
+      $.each(sources, function (i, source) {
+        $list_for_sauces.append('<li id="list-sauce_' + i + '"><a class="naslov">' + source.name + '</a>:<p>' + source.description + '</p></li>');
       });
       $list_for_sauces.show(300);
     });
 
     $sauces_title.show(300);
 
+  }
+
+  
+  function data_not_ok() {
+    errorSleepTime *= 2;
+    console.log(errorSleepTime);
+    //alert(errorSleepTime);
+    //ovaj bind ne znam kako radi, ali radi!
+    window.setTimeout(post_ajax.bind(null, "http://localhost:8000", JSON.stringify(sending_parameters), data_ok, data_not_ok), errorSleepTime);
   }
 
 
@@ -142,7 +142,7 @@ $(function () {
     //alert(initial_request);
 
     errorSleepTime = 500;
-    
+
     //console.log(data);
     obj = JSON.parse(data);
     //console.log(obj);
@@ -160,14 +160,16 @@ $(function () {
 
     $headline_title.show(300);
 
-     
-    //ponovo salji zahtev
+
+
     sending_parameters.initial_request = false;
-    alert(JSON.stringify(sending_parameters));
-    
-    window.setTimeout(post_ajax('http://localhost:8000',JSON.stringify(sending_parameters)), 0);
+    //alert(JSON.stringify(sending_parameters));
+
+    //ponovo salji zahtev
+    //ovaj bind ne znam kako radi, ali radi!
+    window.setTimeout(post_ajax.bind(null, 'http://localhost:8000', JSON.stringify(sending_parameters), data_ok, data_not_ok), 0);
     console.log(JSON.stringify(sending_parameters))
- 
+
   }
   //ode ga umetni......................
 

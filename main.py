@@ -90,6 +90,7 @@ class SourceHandler(tornado.web.RequestHandler):
 
 
 class MainHandler(tornado.web.RequestHandler):
+
     def get(self):
          
         self.render("index.html",
@@ -119,11 +120,7 @@ class MainHandler(tornado.web.RequestHandler):
         #treba da vratim kontrolu ioloop-u dok potražujem podatke od apija.
         #tek po prispeću podataka od apija, "aktiviram klijenta" šaljući mu odgovor nazad
 
-        #ovaj global_message_buffer mozda nije vezan za tog klijenta(!?)
-        #self.wait_future = global_message_buffer.cond.wait()
-
-
-
+    
         a=dic_data['country']
         b=dic_data['category']
         initial_request = dic_data['initial_request']
@@ -132,6 +129,7 @@ class MainHandler(tornado.web.RequestHandler):
  
         if(not initial_request):
             #cekaj recimo pet minuta
+            #10s sam stavio da vidim kako radi
             print('ceka odredjeno vreme na proveru')
             await asyncio.sleep(10)
             print("okay done now")
@@ -171,36 +169,29 @@ class MainHandler(tornado.web.RequestHandler):
 
         #print('status:', status1)
         
-        #ovde bi trebala jedna f-ja koja šalje i odblokira
-
-
-        #global_message_buffer.add_message(podaci1)
-        #print(global_message_buffer.cache)
-
-        #self.write(global_message_buffer.cache)
-        
         self.write(json.dumps({'sent': podaci1}))
 
         print('dosli smo do kraja puta')
 
     
-
-    '''
     #Called in async handlers if the client closed the connection.
     #Override this to clean up resources associated with long-lived connections. Note that this method is called only
     #if the connection was closed during asynchronous processing; if you need to do cleanup after every request
     #override on_finish instead.
-    def on_connection_close(self):
-        self.wait_future.cancel()
-        
     '''
+    def on_connection_close(self):
+        #nije response1, jer je to odgovor od API-ja
+        #meni treba da obradim slucaj kada klijent zatvori tab
+        self.response1.cancel()
+    '''
+    
         
         
 
 if __name__ == '__main__':
     tornado.options.parse_command_line()
     app = tornado.web.Application(
-        handlers=[(r'/',MainHandler),
+        handlers=[(r'/', MainHandler),
                   (r'/sources', SourceHandler),
                   ],
         template_path = os.path.join(os.path.dirname(__file__),"templates"),
