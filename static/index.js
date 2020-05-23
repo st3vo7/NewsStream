@@ -6,6 +6,7 @@ $(function () {
   var initial_request;
   var errorSleepTime = 500;
   var sending_parameters;
+  var tmp_list_url = [];
 
 
   function izvuci_broj(data) {
@@ -21,16 +22,30 @@ $(function () {
     var $country = $('#group1 :checked');
     //alert($country.val());
 
+    var package = {
+      country: $country.val()
+    }
+
+    package.initial_request = true;
+    sending_parameters = package;
+
+
+
+    /* 
     $.ajax({
       type: 'POST',
       url: 'http://localhost:8000/sources',
-      data: JSON.stringify($country.val()),
+      data: JSON.stringify(package),
       contentType: "json",
       success: data_ok_sources,
       error: function () {
         alert('greska');
       }
-    });
+    }); */
+
+    post_ajax('http://localhost:8000/sources', JSON.stringify(package), data_ok_sources, data_not_ok_sources)
+
+
 
 
   });
@@ -53,11 +68,13 @@ $(function () {
 
     };
 
-
+    package.initial_request = true;
     //da bih mogao da ga koristim ponovo u data_ok, jer package nije vidljiv van ove f-je
     sending_parameters = package;
 
-    package.initial_request = true;
+    tmp_list_url = [];
+
+
 
     //alert(JSON.stringify(package));
 
@@ -78,9 +95,11 @@ $(function () {
 
     post_ajax('http://localhost:8000', JSON.stringify(package), data_ok, data_not_ok);
 
-
-    //ode ga umetni...................
   });
+
+  function check_if_not_in(word, text){
+    return !text.includes(word);
+  }
 
 
   function post_ajax(url, data, success_function, failure_function) {
@@ -96,6 +115,67 @@ $(function () {
 
   }
 
+  function data_ok(data) {
+
+    var $list_for_headlines = $('#ajax_headlines_list');
+    var $headline_title = $('#ajax_title');
+    //var $headlines_panel = $('#panel_top_headlines');
+
+    errorSleepTime = 500;
+
+    //console.log(data);
+    obj = JSON.parse(data);
+    //console.log(obj);
+    
+
+    //alert(sending_parameters.initial_request);
+
+
+    var articles = obj.sent.articles;
+
+    if (sending_parameters.initial_request) {
+
+      $list_for_headlines.hide(300, function () {
+        $list_for_headlines.empty();
+        $.each(articles, function (i, article) {
+          $list_for_headlines.append('<li id="list-title_' + i + '" class="listica"><a class="naslov">' + article.title + '<br></a></li>');
+          tmp_list_url.push(article.url)
+        });
+        $list_for_headlines.show(300);
+        //alert(tmp_list_url);
+      });
+
+      $headline_title.show(300);
+
+    }
+
+    else {
+      $.each(articles,function(i,article){
+        //alert(check_if_not_in(article.url,tmp_list_url));
+        if(check_if_not_in(article.url,tmp_list_url)){
+          //dodaj na pocetak liste
+          $list_for_headlines.append('<li id="list-title_' + i + '" class="listica"><a class="naslov">' + article.title + '<br></a></li>');
+          tmp_list_url.push(article.url)
+          
+        }
+        //inace nista 
+
+      });
+
+    }
+
+
+
+    sending_parameters.initial_request = false;
+    //alert(JSON.stringify(sending_parameters));
+
+    //ponovo salji zahtev
+    //ovaj bind ne znam kako radi, ali radi!
+    window.setTimeout(post_ajax.bind(null, 'http://localhost:8000', JSON.stringify(sending_parameters), data_ok, data_not_ok), 0);
+    console.log(JSON.stringify(sending_parameters))
+
+  }
+
 
 
   function data_ok_sources(data) {
@@ -104,8 +184,11 @@ $(function () {
     var $list_for_sauces = $('#ajax_sauces_list');
     var $sauces_title = $('#sauces_title');
 
+    errorSleepTime = 500;
+
     obj = JSON.parse(data);
     console.log(obj);
+
     var sources = obj.sent.sources;
     console.log(sources);
 
@@ -119,59 +202,39 @@ $(function () {
 
     $sauces_title.show(300);
 
-  }
-
-  
-  function data_not_ok() {
-    errorSleepTime *= 2;
-    console.log(errorSleepTime);
-    //alert(errorSleepTime);
-    //ovaj bind ne znam kako radi, ali radi!
-    window.setTimeout(post_ajax.bind(null, "http://localhost:8000", JSON.stringify(sending_parameters), data_ok, data_not_ok), errorSleepTime);
-  }
-
-
-  function data_ok(data) {
-
-
-    var $list_for_headlines = $('#ajax_headlines_list');
-    var $headline_title = $('#ajax_title');
-    //var $headlines_panel = $('#panel_top_headlines');
-
-    initial_request = false;
-    //alert(initial_request);
-
-    errorSleepTime = 500;
-
-    //console.log(data);
-    obj = JSON.parse(data);
-    //console.log(obj);
-
-
-    var articles = obj.sent.articles;
-
-    $list_for_headlines.hide(300, function () {
-      $list_for_headlines.empty();
-      $.each(articles, function (i, article) {
-        $list_for_headlines.append('<li id="list-title_' + i + '" class="listica"><a class="naslov">' + article.title + '<br></a></li>');
-      });
-      $list_for_headlines.show(300);
-    });
-
-    $headline_title.show(300);
-
-
-
     sending_parameters.initial_request = false;
     //alert(JSON.stringify(sending_parameters));
 
     //ponovo salji zahtev
     //ovaj bind ne znam kako radi, ali radi!
-    window.setTimeout(post_ajax.bind(null, 'http://localhost:8000', JSON.stringify(sending_parameters), data_ok, data_not_ok), 0);
+    window.setTimeout(post_ajax.bind(null, 'http://localhost:8000/sources', JSON.stringify(sending_parameters), data_ok_sources, data_not_ok_sources), 0);
     console.log(JSON.stringify(sending_parameters))
 
+
   }
-  //ode ga umetni......................
+
+  function data_not_ok_sources() {
+    errorSleepTime *= 2;
+    console.log(errorSleepTime);
+    //alert(errorSleepTime);
+
+    //ovaj bind ne znam kako radi, ali radi!
+    window.setTimeout(post_ajax.bind(null, "http://localhost:8000/sources", JSON.stringify(sending_parameters), data_ok, data_not_ok_sources), errorSleepTime);
+
+  }
+
+
+  function data_not_ok() {
+    errorSleepTime *= 2;
+    console.log(errorSleepTime);
+    //alert(errorSleepTime);
+
+    //ovaj bind ne znam kako radi, ali radi!
+    window.setTimeout(post_ajax.bind(null, "http://localhost:8000", JSON.stringify(sending_parameters), data_ok, data_not_ok), errorSleepTime);
+  }
+
+
+
 
   $('#ajax_headlines_list').on('click', '.listica', function () {
     //alert($(this).closest('li')[0].id);

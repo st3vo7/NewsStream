@@ -39,7 +39,7 @@ class SourceHandler(tornado.web.RequestHandler):
                     )
         
         
-    def post(self):
+    async def post(self):
         print('u postu sam')
         izvori1 = []
         
@@ -58,13 +58,21 @@ class SourceHandler(tornado.web.RequestHandler):
         #print(a)
 
         print('---'*26)
-        a = tornado.escape.json_decode(self.request.body)
-        print(a)
+        dic_data = tornado.escape.json_decode(self.request.body)
+        print(dic_data)
         print('---'*26)
 
         #nakon što sam primio zahtev od klijenta, ovde
         #treba da vratim kontrolu ioloop-u dok potražujem podatke od apija.
         #tek po prispeću podataka od apija, "aktiviram klijenta" šaljući mu odgovor nazad
+
+        a=dic_data['country']
+        initial_request = dic_data['initial_request']
+
+        if(not initial_request):
+            print('cekaj malo dok proveris')
+            await asyncio.sleep(10)
+            print('gotovo cekanje')
         
         
        
@@ -74,19 +82,33 @@ class SourceHandler(tornado.web.RequestHandler):
                 #'category=technology&'
                 #'q=manchester city&'
                 'apiKey=17060bbc869845deb9246555cd6f8e5d')
-        
+
+
+        http_client = tornado.httpclient.AsyncHTTPClient()
+        try:
+            response1 = await http_client.fetch(url)
+        except Exception as e:
+            print('An error occurred: %s' %e)
+
+        podaci1 = tornado.escape.json_decode(response1.body)
+        pprint.pprint(podaci1)
+
+        '''
         response3 = requests.get(url)
         podaci3 = response3.json()
-        print(json.dumps(podaci3, indent=1))
+        print(json.dumps(podaci3, indent=1))'
+        '''
         
-        status3 = podaci3['status']
+        status1 = podaci1['status']
         #print(status3)
-        if status3=='error':
-            print(status3)
-            print(podaci3['code'])
-            print(podaci3['message'])
+        if status1=='error':
+            print(status1)
+            print(podaci1['code'])
+            print(podaci1['message'])
 
-        self.write(json.dumps({'sent': podaci3}))
+        self.write(json.dumps({'sent': podaci1}))
+
+        print('kraj posta u sauces')
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -131,7 +153,7 @@ class MainHandler(tornado.web.RequestHandler):
             #cekaj recimo pet minuta
             #10s sam stavio da vidim kako radi
             print('ceka odredjeno vreme na proveru')
-            await asyncio.sleep(10)
+            await asyncio.sleep(600)
             print("okay done now")
         
 
