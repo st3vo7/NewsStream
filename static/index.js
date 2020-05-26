@@ -9,6 +9,7 @@ $(function () {
   var tmp_list_url = [];
 
 
+
   function izvuci_broj(data) {
 
     return data.split('_')[1];
@@ -45,10 +46,9 @@ $(function () {
 
     post_ajax('http://localhost:8000/sources', JSON.stringify(package), data_ok_sources, data_not_ok_sources)
 
-
-
-
   });
+
+
 
 
 
@@ -58,15 +58,27 @@ $(function () {
     //forma se nije poslala klasicno
     e.preventDefault();
 
+    var package;
+
     var $country = $('#group1 :checked');
     var $category = $('#group2 :checked');
+    //alert($category.val());
 
+    if (!$category.val()) {
+      package = {
+        country: $country.val(),
+        category: 'general',
 
-    var package = {
-      country: $country.val(),
-      category: $category.val(),
+      };
+    }
 
-    };
+    else {
+      package = {
+        country: $country.val(),
+        category: $category.val(),
+
+      };
+    }
 
     package.initial_request = true;
     //da bih mogao da ga koristim ponovo u data_ok, jer package nije vidljiv van ove f-je
@@ -97,7 +109,7 @@ $(function () {
 
   });
 
-  function check_if_not_in(word, text){
+  function check_if_not_in(word, text) {
     return !text.includes(word);
   }
 
@@ -126,7 +138,7 @@ $(function () {
     //console.log(data);
     obj = JSON.parse(data);
     //console.log(obj);
-    
+
 
     //alert(sending_parameters.initial_request);
 
@@ -150,13 +162,13 @@ $(function () {
     }
 
     else {
-      $.each(articles,function(i,article){
+      $.each(articles, function (i, article) {
         //alert(check_if_not_in(article.url,tmp_list_url));
-        if(check_if_not_in(article.url,tmp_list_url)){
+        if (check_if_not_in(article.url, tmp_list_url)) {
           //dodaj na pocetak liste
           $list_for_headlines.append('<li id="list-title_' + i + '" class="listica"><a class="naslov">' + article.title + '<br></a></li>');
           tmp_list_url.push(article.url)
-          
+
         }
         //inace nista 
 
@@ -289,6 +301,31 @@ $(function () {
     }
 
   });
+
+
+  $('#group1').on('click', function () {
+
+    //alert(document.querySelector('input[name="country"]:checked').nextSibling.textContent);
+    $('#btnCountry').text(document.querySelector('input[name="country"]:checked').nextSibling.textContent);
+    // $('#btnCountry').parentElement.addClass('dotted_border');
+
+    $('#btnSend').removeAttr('disabled');
+
+  });
+
+
+
+  $('#group2').on('click', function () {
+
+    //alert(document.querySelector('input[name="country"]:checked').nextSibling.textContent);
+    $('#btnCategory').text(document.querySelector('input[name="category"]:checked').nextSibling.textContent);
+    //$('#btnCategory').addClass('dotted_border');
+  });
+
+
+
+
+
 
 
 });

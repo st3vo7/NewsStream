@@ -71,7 +71,7 @@ class SourceHandler(tornado.web.RequestHandler):
 
         if(not initial_request):
             print('cekaj malo dok proveris')
-            await asyncio.sleep(10)
+            await asyncio.sleep(600)
             print('gotovo cekanje')
         
         
@@ -81,6 +81,7 @@ class SourceHandler(tornado.web.RequestHandler):
                 'country='+a+'&'
                 #'category=technology&'
                 #'q=manchester city&'
+                'pageSize=100&'
                 'apiKey=17060bbc869845deb9246555cd6f8e5d')
 
 
@@ -161,6 +162,7 @@ class MainHandler(tornado.web.RequestHandler):
         url = ( 'https://newsapi.org/v2/top-headlines?'
                 'country='+a+'&'
                 'category='+b+'&'
+                'pageSize=100&'
                 #'q=bomba&'
                 'apiKey=17060bbc869845deb9246555cd6f8e5d')
         print(url)
