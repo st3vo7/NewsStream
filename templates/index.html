@@ -9,7 +9,7 @@
     <div class="navbar">
 
         <a href="http://localhost:8000/">
-            <img src="static/images/logo1.png" border="0" alt="NewsStream"  width="60px" height="55px">
+            <img src="static/images/logo1.png" border="0" alt="NewsStream" width="60px" height="55px">
         </a>
 
 
@@ -36,7 +36,7 @@
                     <a><input type="radio" name="country" value="gb" class="radio"> Great Britain <br></a>
                     <a><input type="radio" name="country" value="gr" class="radio"> Greece <br></a>
                     <a><input type="radio" name="country" value="hk" class="radio"> Hong Kong <br></a>
-                    <a><input type="radio" name="country" value="hu" class="radio"> Hungary  <br></a>
+                    <a><input type="radio" name="country" value="hu" class="radio"> Hungary <br></a>
                     <a><input type="radio" name="country" value="id" class="radio"> Indonesia <br></a>
                     <a><input type="radio" name="country" value="ie" class="radio"> Ireland <br></a>
                     <a><input type="radio" name="country" value="il" class="radio"> Israel <br></a>
@@ -71,7 +71,7 @@
                     <a><input type="radio" name="country" value="us" class="radio"> United States of America <br></a>
                     <a><input type="radio" name="country" value="ve" class="radio"> Venezuela <br></a>
                     <a><input type="radio" name="country" value="za" class="radio"> South Africa <br></a>
-                    
+
                 </fieldset>
             </div>
         </div>
@@ -92,6 +92,16 @@
             </div>
         </div>
 
+        <div class="dropdown">
+            <button class="dropbtn" id="btnSortBy"> Sort by <i class="fa fa-caret-down"> </i> </button>
+            <div class="dropdown-content">
+                <a><input type="radio" name="sorting" value="nto" class="radio" disabled checked> Date: new to old <br></a>
+                <a><input type="radio" name="sorting" value="otn" class="radio" disabled> Date: old to new <br></a>
+                
+            </div>
+        </div>
+
+        
         <a style="float: right;"><input id="btnSend" type="submit" class="btn" value="Send" disabled='disable'> </a>
 
 
