@@ -71,7 +71,8 @@ class SourceHandler(tornado.web.RequestHandler):
 
         if(not initial_request):
             print('cekaj malo dok proveris')
-            await asyncio.sleep(600)
+            self.sleeping_client = asyncio.sleep(600)
+            await self.sleeping_client
             print('gotovo cekanje')
         
         
@@ -110,6 +111,13 @@ class SourceHandler(tornado.web.RequestHandler):
         self.write(json.dumps({'sent': podaci1}))
 
         print('kraj posta u sauces')
+     
+    def on_connection_close(self):
+
+        print('***'*15)
+        asyncio.ensure_future(self.sleeping_client).cancel()
+        print("A client has left the room.")
+        print('***'*15)
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -154,7 +162,9 @@ class MainHandler(tornado.web.RequestHandler):
             #cekaj recimo pet minuta
             #10s sam stavio da vidim kako radi
             print('ceka odredjeno vreme na proveru')
-            await asyncio.sleep(600)
+            self.sleeping_client = asyncio.sleep(600)
+            await self.sleeping_client
+
             print("okay done now")
         
 
@@ -175,10 +185,7 @@ class MainHandler(tornado.web.RequestHandler):
         #else:
             #print(response1.body)
 
-        #response1 = requests.get(url)
-        #podaci1 = response1.json()
-
-        #umesto toga
+        
         podaci1 = tornado.escape.json_decode(response1.body)
         pprint.pprint(podaci1)
 
@@ -198,16 +205,33 @@ class MainHandler(tornado.web.RequestHandler):
         print('dosli smo do kraja puta')
 
     
-    #Called in async handlers if the client closed the connection.
-    #Override this to clean up resources associated with long-lived connections. Note that this method is called only
-    #if the connection was closed during asynchronous processing; if you need to do cleanup after every request
-    #override on_finish instead.
-    '''
+    
     def on_connection_close(self):
+
+        '''
+        Override this to clean up resources associated with long-lived connections.
+        Note that this method is called only if the connection was closed during asynchronous processing; 
+        if you need to do cleanup after every request override on_finish instead.
+        '''
+
         #nije response1, jer je to odgovor od API-ja
         #meni treba da obradim slucaj kada klijent zatvori tab
-        self.response1.cancel()
-    '''
+        #self.response1.cancel()
+        #self.sleeping_client.cancel()
+
+
+        print('***'*15)
+        #print(asyncio.isfuture(self.sleeping_client))
+        #print(asyncio.iscoroutine(self.sleeping_client))
+        #print(asyncio.isfuture(asyncio.ensure_future(self.sleeping_client)))
+
+
+        asyncio.ensure_future(self.sleeping_client).cancel()
+        print("A client has left the room.")
+        print('***'*15)
+
+        
+    
     
         
         
