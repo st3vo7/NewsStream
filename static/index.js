@@ -150,7 +150,7 @@ $(function () {
       $list_for_headlines.hide(300, function () {
         $list_for_headlines.empty();
         $.each(articles, function (i, article) {
-          $list_for_headlines.append('<li id="list-title_' + i + '" class="listica"><a class="naslov">' + article.title + '<br></a></li>');
+          $list_for_headlines.append('<li id="list-title_' + i + '" class="listica" name="' + article.publishedAt + '"><a class="naslov">' + article.title + '<br></a></li>');
           tmp_list_url.push(article.url)
         });
         $list_for_headlines.show(300);
@@ -176,6 +176,20 @@ $(function () {
 
     }
 
+    //omoguci sortiranje da bude clickable
+
+    //alert(document.querySelectorAll('input[name="sorting"]'))
+    //vrati ti listu nodova, kroz koju moras da se kreces i pobrises atribute disabled
+
+    //zato sto na pocetku ne mozes da biras ali kasnije mozes
+    $('#srtNto').removeAttr('disabled');
+    $('#srtOtn').removeAttr('disabled');
+
+    //vraca se na defaultnu vrednost
+    $('#srtOtn').prop('checked', false);
+    $('#srtNto').prop('checked', true);
+
+
 
 
     sending_parameters.initial_request = false;
@@ -186,8 +200,8 @@ $(function () {
     window.setTimeout(post_ajax.bind(null, 'http://localhost:8000', JSON.stringify(sending_parameters), data_ok, data_not_ok), 0);
     console.log(JSON.stringify(sending_parameters))
 
-  }
 
+  }
 
 
   function data_ok_sources(data) {
@@ -314,13 +328,51 @@ $(function () {
   });
 
 
-
   $('#group2').on('click', function () {
 
     //alert(document.querySelector('input[name="country"]:checked').nextSibling.textContent);
     $('#btnCategory').text(document.querySelector('input[name="category"]:checked').nextSibling.textContent);
     //$('#btnCategory').addClass('dotted_border');
   });
+
+
+  $('#srtNto').on('click', function () {
+    $('#ajax_headlines_list').removeClass('sortOtn');
+    $('#ajax_headlines_list').addClass('sortNto');
+
+    $('#ajax_headlines_list').slideUp(300, function(){
+      $('#ajax_headlines_list li').sort(sort_li_asc).appendTo('#ajax_headlines_list');
+      $('#ajax_headlines_list').slideDown(300);
+    });
+    
+
+  });
+
+
+  $('#srtOtn').on('click', function () {
+    $('#ajax_headlines_list').removeClass('sortNto');
+    $('#ajax_headlines_list').addClass('sortOtn');
+
+    $('#ajax_headlines_list').slideUp(300, function(){
+      $('#ajax_headlines_list li').sort(sort_li_desc).appendTo('#ajax_headlines_list');
+      $('#ajax_headlines_list').slideDown(300);
+    });
+  });
+
+
+  function sort_li_asc(a, b) {
+    //alert(new Date($(b).attr("name")) - new Date($(a).attr("name")));
+    return new Date($(b).attr("name")) - new Date($(a).attr("name"));
+  }
+
+
+  function sort_li_desc(a, b) {
+    //alert(new Date($(b).attr("name")) - new Date($(a).attr("name")));
+    return new Date($(a).attr("name")) - new Date($(b).attr("name"));
+  }
+
+
+
 
 
 

@@ -220,19 +220,20 @@ class MainHandler(tornado.web.RequestHandler):
         #self.sleeping_client.cancel()
 
 
-        print('***'*15)
+       
         #print(asyncio.isfuture(self.sleeping_client))
         #print(asyncio.iscoroutine(self.sleeping_client))
         #print(asyncio.isfuture(asyncio.ensure_future(self.sleeping_client)))
 
+         
+        try:
+            print('***'*15)
+            asyncio.ensure_future(self.sleeping_client).cancel()
+            print("A client has left the room.")
+            print('***'*15)
 
-        asyncio.ensure_future(self.sleeping_client).cancel()
-        print("A client has left the room.")
-        print('***'*15)
-
-        
-    
-    
+        except asyncio.CancelledError as e:
+            print("An error occurred: %s" % e) 
         
         
 
