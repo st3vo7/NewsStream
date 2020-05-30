@@ -4,7 +4,121 @@
 {% block body %}
 
 <form method="POST">
-    <h3> Choose a country: </h3>
+    <div class="navbar">
+
+        <a href="http://localhost:8000/">
+            <img src="static/images/logo1.png" alt="NewsStream" width="60px" height="55px">
+        </a>
+
+
+        <div class="dropdown">
+            <button class="dropbtn" id="btnCountry" disabled> Country <i class="fa fa-caret-down"> </i> </button>
+            <div class="dropdown-content">
+                <fieldset id="group1">
+                    <a><input type="radio" name="country" value="ar" class="radio"> Argentina <br></a>
+                    <a><input type="radio" name="country" value="at" class="radio"> Austria <br></a>
+                    <a><input type="radio" name="country" value="au" class="radio"> Australia <br></a>
+                    <a><input type="radio" name="country" value="be" class="radio"> Belgium <br></a>
+                    <a><input type="radio" name="country" value="bg" class="radio"> Bulgaria <br></a>
+                    <a><input type="radio" name="country" value="br" class="radio"> Brazil <br></a>
+                    <a><input type="radio" name="country" value="ca" class="radio"> Canada <br></a>
+                    <a><input type="radio" name="country" value="cn" class="radio"> China <br></a>
+                    <a><input type="radio" name="country" value="co" class="radio"> Colombia <br></a>
+                    <a><input type="radio" name="country" value="cu" class="radio"> Cuba <br></a>
+                    <a><input type="radio" name="country" value="cz" class="radio"> Czechia <br></a>
+                    <a><input type="radio" name="country" value="eg" class="radio"> Egypt <br></a>
+                    <a><input type="radio" name="country" value="fr" class="radio"> France <br></a>
+                    <a><input type="radio" name="country" value="de" class="radio"> Germany <br></a>
+                    <a><input type="radio" name="country" value="gb" class="radio"> Great Britain <br></a>
+                    <a><input type="radio" name="country" value="gr" class="radio"> Greece <br></a>
+                    <a><input type="radio" name="country" value="hk" class="radio"> Hong Kong <br></a>
+                    <a><input type="radio" name="country" value="hu" class="radio"> Hungary <br></a>
+                    <a><input type="radio" name="country" value="in" class="radio"> India <br></a>
+                    <a><input type="radio" name="country" value="id" class="radio"> Indonesia <br></a>
+                    <a><input type="radio" name="country" value="ie" class="radio"> Ireland <br></a>
+                    <a><input type="radio" name="country" value="il" class="radio"> Israel <br></a>
+                    <a><input type="radio" name="country" value="it" class="radio"> Italy <br></a>
+                    <a><input type="radio" name="country" value="jp" class="radio"> Japan <br></a>
+                    <a><input type="radio" name="country" value="kr" class="radio"> Republic of Korea <br></a>
+                    <a><input type="radio" name="country" value="lv" class="radio"> Latvia <br></a>
+                    <a><input type="radio" name="country" value="lt" class="radio"> Lithuania <br></a>
+                    <a><input type="radio" name="country" value="my" class="radio"> Malaysia <br></a>
+                    <a><input type="radio" name="country" value="mx" class="radio"> Mexico <br></a>
+                    <a><input type="radio" name="country" value="ma" class="radio"> Morocco <br></a>
+                    <a><input type="radio" name="country" value="nl" class="radio"> Netherlands <br></a>
+                    <a><input type="radio" name="country" value="nz" class="radio"> New Zeland <br></a>
+                    <a><input type="radio" name="country" value="ng" class="radio"> Nigeria <br></a>
+                    <a><input type="radio" name="country" value="no" class="radio"> Norway <br></a>
+                    <a><input type="radio" name="country" value="ph" class="radio"> Philippines <br></a>
+                    <a><input type="radio" name="country" value="pl" class="radio"> Poland <br></a>
+                    <a><input type="radio" name="country" value="pt" class="radio"> Portugal <br></a>
+                    <a><input type="radio" name="country" value="ro" class="radio"> Romania <br></a>
+                    <a><input type="radio" name="country" value="ru" class="radio"> Russia <br></a>
+                    <a><input type="radio" name="country" value="sa" class="radio"> Saudi Arabia <br></a>
+                    <a><input type="radio" name="country" value="rs" class="radio"> Serbia <br></a>
+                    <a><input type="radio" name="country" value="sg" class="radio"> Singapore <br></a>
+                    <a><input type="radio" name="country" value="sk" class="radio"> Slovakia <br></a>
+                    <a><input type="radio" name="country" value="si" class="radio"> Slovenia <br></a>
+                    <a><input type="radio" name="country" value="za" class="radio"> South Africa <br></a>
+                    <a><input type="radio" name="country" value="se" class="radio"> Sweden <br></a>
+                    <a><input type="radio" name="country" value="ch" class="radio"> Switzerland <br></a>
+                    <a><input type="radio" name="country" value="tw" class="radio"> Taiwan <br></a>
+                    <a><input type="radio" name="country" value="th" class="radio"> Thailand <br></a>
+                    <a><input type="radio" name="country" value="tr" class="radio"> Turkey <br></a>
+                    <a><input type="radio" name="country" value="ua" class="radio"> Ukraine <br></a>
+                    <a><input type="radio" name="country" value="ae" class="radio"> United Arab Emirates <br></a>
+                    <a><input type="radio" name="country" value="us" class="radio"> United States of America <br></a>
+                    <a><input type="radio" name="country" value="ve" class="radio"> Venezuela <br></a>
+
+
+                </fieldset>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button class="dropbtn" id="btnCategory" disabled> Category <i class="fa fa-caret-down"> </i> </button>
+            <div class="dropdown-content">
+                <fieldset id="group2">
+                    <a><input type="radio" name="category" value="general" class="radio"> General <br></a>
+                    <a><input type="radio" name="category" value="entertainment" class="radio"> Entertainment <br></a>
+                    <a><input type="radio" name="category" value="business" class="radio"> Business <br></a>
+                    <a><input type="radio" name="category" value="health" class="radio"> Health <br></a>
+                    <a><input type="radio" name="category" value="science" class="radio"> Science <br></a>
+                    <a><input type="radio" name="category" value="sports" class="radio"> Sports <br></a>
+                    <a><input type="radio" name="category" value="technology" class="radio"> Technology <br></a>
+                </fieldset>
+
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button class="dropbtn" id="btnLanguage" disabled> Language <i class="fa fa-caret-down"> </i> </button>
+            <div class="dropdown-content">
+                <fieldset id="group3">
+                    <a><input type="radio" name="language" value="ar" class="radio"> Arabic <br></a>
+                    <a><input type="radio" name="language" value="zh" class="radio"> Chinese <br></a>
+                    <a><input type="radio" name="language" value="nl" class="radio"> Dutch <br></a>
+                    <a><input type="radio" name="language" value="en" class="radio"> English <br></a>
+                    <a><input type="radio" name="language" value="fr" class="radio"> French <br></a>
+                    <a><input type="radio" name="language" value="de" class="radio"> German <br></a>
+                    <a><input type="radio" name="language" value="he" class="radio"> Hebrew <br></a>
+                    <a><input type="radio" name="language" value="it" class="radio"> Italian <br></a>
+                    <a><input type="radio" name="language" value="ru" class="radio"> Russian <br></a>
+                    <a><input type="radio" name="language" value="es" class="radio"> Spanish <br></a>
+
+                </fieldset>
+
+            </div>
+        </div>
+
+
+        <a style="float: right;"><input id="btnSources" type="submit" class="btn" value="Send" disabled> </a>
+
+
+    </div>
+
+
+   <!--  <h3> Choose a country: </h3>
     <fieldset id="group1">
         <input type="radio" name="drzava" value="gb" checked> Great Britain <br>
         <input type="radio" name="drzava" value="ru"> Russia <br>
@@ -12,15 +126,15 @@
     </fieldset>
     <br>
 
-    <input id="btnSources" type="submit" class="btn" value="Send">
+    <input id="btnSources" type="submit" class="btn" value="Send"> -->
 
 </form>
 
 <div id="sauces_list">
     <h2 id="sauces_title" class="sakrij"> Sources: </h3>
-    <ul id="ajax_sauces_list">
+        <ul id="ajax_sauces_list">
 
-    </ul>
+        </ul>
 </div>
 
 {% end %}

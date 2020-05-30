@@ -41,7 +41,6 @@ class SourceHandler(tornado.web.RequestHandler):
         
     async def post(self):
         print('u postu sam')
-        izvori1 = []
         
         
         if self.get_argument("btn1",None) != None:
@@ -67,7 +66,21 @@ class SourceHandler(tornado.web.RequestHandler):
         #tek po prispeću podataka od apija, "aktiviram klijenta" šaljući mu odgovor nazad
 
         a=dic_data['country']
+        b=''
+        c=''
         initial_request = dic_data['initial_request']
+
+        if('category' in dic_data):
+            b=dic_data['category']
+            print(b)
+            print()
+        
+        if('language' in dic_data):
+            c=dic_data['language']
+            print(c)
+            print()
+
+
 
         if(not initial_request):
             print('cekaj malo dok proveris')
@@ -78,10 +91,9 @@ class SourceHandler(tornado.web.RequestHandler):
         
        
         url = ( 'https://newsapi.org/v2/sources?'
-                #'language=en&'
                 'country='+a+'&'
-                #'category=technology&'
-                #'q=manchester city&'
+                'category='+b+'&'
+                'language='+c+'&'
                 'pageSize=100&'
                 'apiKey=17060bbc869845deb9246555cd6f8e5d')
 
@@ -172,7 +184,6 @@ class MainHandler(tornado.web.RequestHandler):
             print('ceka odredjeno vreme na proveru')
             self.sleeping_client = asyncio.sleep(600)
             await self.sleeping_client
-
             print("okay done now")
         
 
