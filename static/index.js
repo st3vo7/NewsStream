@@ -60,24 +60,49 @@ $(function () {
 
     var package;
 
+
+
     var $country = $('#group1 :checked');
     var $category = $('#group2 :checked');
-    //alert($category.val());
+    var $keyword = $('#qsearch');
+    //alert($keyword.val());
+
 
     if (!$category.val()) {
-      package = {
-        country: $country.val(),
-        category: 'general',
 
-      };
+      if ($keyword.val()) {
+        package = {
+          country: $country.val(),
+          category: 'general',
+          keyword: $keyword.val()
+        };
+
+      }
+      else {
+        package = {
+          country: $country.val(),
+          category: 'general',
+        };
+      }
     }
 
     else {
-      package = {
-        country: $country.val(),
-        category: $category.val(),
 
-      };
+      if ($keyword.val()) {
+        package = {
+          country: $country.val(),
+          category: $category.val(),
+          keyword: $keyword.val()
+        };
+
+      }
+
+      else {
+        package = {
+          country: $country.val(),
+          category: $category.val(),
+        };
+      }
     }
 
     package.initial_request = true;
@@ -340,11 +365,11 @@ $(function () {
     $('#ajax_headlines_list').removeClass('sortOtn');
     $('#ajax_headlines_list').addClass('sortNto');
 
-    $('#ajax_headlines_list').slideUp(300, function(){
+    $('#ajax_headlines_list').slideUp(400, function () {
       $('#ajax_headlines_list li').sort(sort_li_asc).appendTo('#ajax_headlines_list');
-      $('#ajax_headlines_list').slideDown(300);
+      $('#ajax_headlines_list').slideDown(400);
     });
-    
+
 
   });
 
@@ -353,9 +378,9 @@ $(function () {
     $('#ajax_headlines_list').removeClass('sortNto');
     $('#ajax_headlines_list').addClass('sortOtn');
 
-    $('#ajax_headlines_list').slideUp(300, function(){
+    $('#ajax_headlines_list').slideUp(400, function () {
       $('#ajax_headlines_list li').sort(sort_li_desc).appendTo('#ajax_headlines_list');
-      $('#ajax_headlines_list').slideDown(300);
+      $('#ajax_headlines_list').slideDown(400);
     });
   });
 

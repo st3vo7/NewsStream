@@ -155,6 +155,14 @@ class MainHandler(tornado.web.RequestHandler):
         a=dic_data['country']
         b=dic_data['category']
         initial_request = dic_data['initial_request']
+        c=''
+
+        if('keyword' in dic_data):
+            c=dic_data['keyword']
+            print(c)
+            print()
+
+
         #print(initial_request)
         
  
@@ -173,7 +181,7 @@ class MainHandler(tornado.web.RequestHandler):
                 'country='+a+'&'
                 'category='+b+'&'
                 'pageSize=100&'
-                #'q=bomba&'
+                'q='+c+'&'
                 'apiKey=17060bbc869845deb9246555cd6f8e5d')
         print(url)
 
