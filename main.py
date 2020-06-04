@@ -171,8 +171,8 @@ class MainHandler(tornado.web.RequestHandler):
 
         if('keyword' in dic_data):
             c=dic_data['keyword']
-            print(c)
-            print()
+            #print(c)
+            #print()
 
 
         #print(initial_request)

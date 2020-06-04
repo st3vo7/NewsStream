@@ -36,7 +36,7 @@ $(function () {
       package.category = $category.val();
     }
 
-    if ($category.val()) {
+    if ($language.val()) {
       package.language = $language.val();
     }
 
@@ -60,9 +60,6 @@ $(function () {
     post_ajax('http://localhost:8000/sources', JSON.stringify(package), data_ok_sources, data_not_ok_sources)
 
   });
-
-
-
 
 
   $('#btnSend').on('click', function (e) {
