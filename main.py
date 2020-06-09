@@ -12,24 +12,112 @@ import tornado.escape
 import tornado.locks
 import tornado.httpclient
 
+import motor.motor_tornado
+
+
+
 
 from tornado.options import define, options
 define("port",default=8000, help="run on the given port", type=int)
 
+my_client = ''
 
-class MessageBuffer(object):
-    def __init__(self):
-        self.cond = tornado.locks.Condition()
+
+
+async def do_find_one(collection,value1,value2):
+    document = await collection.find_one({"name" : value1, "password" : value2 })
+    return document
+
+
+async def do_insert(collection, value1, value2):
+    document = {"name" : value1, "password" : value2}
+    result = await collection.insert_one(document)
+    return result
+
+
+
+
+class BaseHandler(tornado.web.RequestHandler):
+
+    def get_current_user(self):
         
-        #lista ili dict?
-        self.cache = {}
-        #self.cache_size = 200
+        if(my_client != ''):
+            return my_client['name']
+        else:
+            return None
+        
+
+class ProfileHandler(BaseHandler):
+
+    @tornado.web.authenticated
+    def get(self):
+        self.render('profile.html', user=self.current_user)
+
     
-    def add_message(self, message):
-        self.cache = json.dumps({'sent': message})
-        self.cond.notify()
+    def post(self):
+        if(self.get_argument("logout",None)!=None):
+            print("unutar if-a logout-a")
+            global my_client
+            my_client = ''
+            self.redirect("/")
+
+class LoginHandler(BaseHandler):
+    def get(self):
+        self.render('login.html')
+    
+    async def post(self):
+
+        if self.get_argument("btnSignIn",None) != None:
+            print("detektovan klik na btnSignIn")
+            self.redirect("/signin")
         
-global_message_buffer = MessageBuffer()
+        db = self.settings['db']
+        collection = db.test
+
+        username = self.get_argument("username")
+        password = self.get_argument("password")
+
+        val = await do_find_one(collection,username,password)
+        print('***'*15)
+        print(val)
+        print('***'*15)
+
+        if(val!= None):
+            global my_client
+            my_client = val
+            self.redirect("/profile")
+        else:
+            self.write('<h1>Nepostojeci klijent</h1>')
+
+
+
+
+class SigninHandler(BaseHandler):
+    def get(self):
+        self.render('signin.html')
+    
+    async def post(self):
+        db = self.settings['db']
+        collection = db.test
+
+        username = self.get_argument("username")
+        password = self.get_argument("password")
+        email = self.get_argument("email")
+
+        val1 = await do_insert(collection,username,password)
+        print("result %s" %repr(val1.inserted_id))
+
+        if(val1 != None):
+            global my_client
+
+            #potrazuje upisanog iz baze
+            val = await do_find_one(collection,username,password)
+            my_client = val
+            self.redirect("/profile")
+        else:
+            print("greska pri upisu u bazu")
+
+
 
 
 class SourceHandler(tornado.web.RequestHandler):
@@ -44,9 +132,9 @@ class SourceHandler(tornado.web.RequestHandler):
         
         
         if self.get_argument("btn1",None) != None:
-            self.redirect("/")
+            self.redirect("/profile")
             return
-        print('prosao redirect na home')
+        print('prosao redirect na profile')
         
         if self.get_argument("btn2",None) != None:
             self.redirect("/sources")
@@ -148,7 +236,7 @@ class MainHandler(tornado.web.RequestHandler):
         print('prosao redirect na sauces')
        
         if self.get_argument("btn1",None) != None:
-            self.redirect("/")
+            self.redirect("/profile")
             return
 
         print('prosao redirect na home')
@@ -258,13 +346,31 @@ class MainHandler(tornado.web.RequestHandler):
 
 if __name__ == '__main__':
     tornado.options.parse_command_line()
+
+    client = motor.motor_tornado.MotorClient('localhost', 27017)
+    db = client.test
+    collection = db.test
+
+    settings = {
+        "template_path" : os.path.join(os.path.dirname(__file__),"templates"),
+        "static_path" : os.path.join(os.path.dirname(__file__),"static"),
+        "login_url" : "/login",
+        "db" : db,
+        "debug" : True
+
+    }
+
+
+
     app = tornado.web.Application(
         handlers=[(r'/', MainHandler),
                   (r'/sources', SourceHandler),
+                  (r'/login', LoginHandler),
+                  (r'/signin', SigninHandler),
+                  (r'/profile', ProfileHandler)
                   ],
-        template_path = os.path.join(os.path.dirname(__file__),"templates"),
-        static_path = os.path.join(os.path.dirname(__file__),"static"),
-        debug=True
+                  **settings
+        
     )
     http_server=tornado.httpserver.HTTPServer(app)
     http_server.listen(options.port)

@@ -344,7 +344,8 @@ $(function () {
 
         $(this).append('<div class="container"><img src="' + articles[id_vesti].urlToImage + '" class="img"</div>')
           .append('<p>' + articles[id_vesti].description + '</p>')
-          .append('<a href="' + articles[id_vesti].url + '"target="_blank" class="zatamni"> Read more... </a>')
+          /* .append('<a id="save_news" class="zatamni"> Save </a>') */
+          .append('<a href="' + articles[id_vesti].url + '" target="_blank" class="zatamni"> Read more... </a>')
           .slideDown(300);
       });
     }
