@@ -30,8 +30,13 @@ async def do_find_one(collection,value1,value2):
 
 
 async def do_insert(collection, value1, value2):
-    document = {"name" : value1, "password" : value2}
+    document = {"name" : value1, "password" : value2, "headlines": []}
     result = await collection.insert_one(document)
+    return result
+
+async def do_insert_headlines(collection, name, password, value1, value2, value3, value4):
+    document = {"headline" : value1, "description" : value2, "url_headline" : value3, "url_img" : value4}
+    result = await collection.update_one({"name" : name, "password" : password} , {'$push' : {"headlines" : document } })
     return result
 
 
@@ -238,8 +243,10 @@ class MainHandler(tornado.web.RequestHandler):
         if self.get_argument("btn1",None) != None:
             self.redirect("/profile")
             return
+        print('prosao redirect na profile')
 
-        print('prosao redirect na home')
+        #ovde treba da proverim da li sam dobio zahtev za vešću
+        #ili zahtev za čuvanjem vesti
 
         print('---'*26)
         #print(self.request.body)
@@ -247,69 +254,101 @@ class MainHandler(tornado.web.RequestHandler):
         print(dic_data)
         print('---'*26)
 
-        #nakon što sam primio zahtev od klijenta, ovde
-        #treba da vratim kontrolu ioloop-u dok potražujem podatke od apija.
-        #tek po prispeću podataka od apija, "aktiviram klijenta" šaljući mu odgovor nazad
 
+        if("headline" in dic_data):
+            print("detektovao sam zahtev za cuvanjem jedne vesti")
+            db = self.settings['db']
+            collection = db.test
+
+            global my_client
+
+            username = my_client['name']
+            print('username: '+username)
+
+            password = my_client['password']
+            print('password: '+password)
+            
+            headline = dic_data['headline']
+            description = dic_data['description']
+            url_headline = dic_data['url_headline']
+            url_img = dic_data['url_img']
+
+            val1 = await do_insert_headlines(collection,username, password, headline, description, url_headline, url_img)
+            
+
+            if(val1 != None):
+                print('azurirana lista vesti trenutnog klijenta')
+            else:
+                print("greska pri upisu u bazu")
+
+        else:
+            print("detektovao sam zahtev za potragom vesi")
+
+
+
+            #nakon što sam primio zahtev od klijenta, ovde
+            #treba da vratim kontrolu ioloop-u dok potražujem podatke od apija.
+            #tek po prispeću podataka od apija, "aktiviram klijenta" šaljući mu odgovor nazad
+
+        
+            a=dic_data['country']
+            b=dic_data['category']
+            initial_request = dic_data['initial_request']
+            c=''
+
+            if('keyword' in dic_data):
+                c=dic_data['keyword']
+                #print(c)
+                #print()
+
+
+            #print(initial_request)
+            
     
-        a=dic_data['country']
-        b=dic_data['category']
-        initial_request = dic_data['initial_request']
-        c=''
-
-        if('keyword' in dic_data):
-            c=dic_data['keyword']
-            #print(c)
-            #print()
-
-
-        #print(initial_request)
-        
- 
-        if(not initial_request):
-            #cekaj recimo pet minuta
-            #10s sam stavio da vidim kako radi
-            print('ceka odredjeno vreme na proveru')
-            self.sleeping_client = asyncio.sleep(600)
-            await self.sleeping_client
-            print("okay done now")
-        
+            if(not initial_request):
+                #cekaj recimo pet minuta
+                #10s sam stavio da vidim kako radi
+                print('ceka odredjeno vreme na proveru')
+                self.sleeping_client = asyncio.sleep(600)
+                await self.sleeping_client
+                print("okay done now")
+            
 
 
-        url = ( 'https://newsapi.org/v2/top-headlines?'
-                'country='+a+'&'
-                'category='+b+'&'
-                'pageSize=100&'
-                'q='+c+'&'
-                'apiKey=17060bbc869845deb9246555cd6f8e5d')
-        print(url)
+            url = ( 'https://newsapi.org/v2/top-headlines?'
+                    'country='+a+'&'
+                    'category='+b+'&'
+                    'pageSize=100&'
+                    'q='+c+'&'
+                    'apiKey=17060bbc869845deb9246555cd6f8e5d')
+            print(url)
 
-        http_client = tornado.httpclient.AsyncHTTPClient()
-        try:
-            response1 = await http_client.fetch(url)
-        except Exception as e:
-            print("An error occurred: %s" % e)
-        #else:
-            #print(response1.body)
+            http_client = tornado.httpclient.AsyncHTTPClient()
+            try:
+                response1 = await http_client.fetch(url)
+            except Exception as e:
+                print("An error occurred: %s" % e)
+            #else:
+                #print(response1.body)
 
-        
-        podaci1 = tornado.escape.json_decode(response1.body)
-        pprint.pprint(podaci1)
+            
+            podaci1 = tornado.escape.json_decode(response1.body)
+            pprint.pprint(podaci1)
 
 
-        status1 = podaci1['status']
-        
-        if status1=='error':
-            print(status1)
-            print(podaci1['code'])
-            print(podaci1['message'])
-        
+            status1 = podaci1['status']
+            
+            if status1=='error':
+                print(status1)
+                print(podaci1['code'])
+                print(podaci1['message'])
+            
 
-        #print('status:', status1)
-        
-        self.write(json.dumps({'sent': podaci1}))
+            #print('status:', status1)
+            
+            self.write(json.dumps({'sent': podaci1}))
 
-        print('dosli smo do kraja puta')
+            print('dosli smo do kraja puta')
 
     
     

@@ -15,6 +15,14 @@ $(function () {
     return data.split('_')[1];
   }
 
+  function obradi_naslov(data){
+    return data.split('<br>')[0]
+  }
+
+  function obradi_url(data){
+    return data.split('"')[1]
+  }
+
 
   $('#btnSources').on('click', function (e) {
     //alert('kliknuto na btnSauce');
@@ -294,6 +302,15 @@ $(function () {
     window.setTimeout(post_ajax.bind(null, "http://localhost:8000", JSON.stringify(sending_parameters), data_ok, data_not_ok), errorSleepTime);
   }
 
+  function data_ok_saving(){
+    //alert($(this).closest('li').children('.naslov').html());
+    //postavi zvezdicu da bude plava
+  }
+
+  function data_not_ok_saving(){
+
+  }
+
 
 
 
@@ -342,13 +359,41 @@ $(function () {
         var id_vesti = izvuci_broj($kliknuta_lista[0].id);
         //alert(id_vesti);
 
-        $(this).append('<div class="container"><img src="' + articles[id_vesti].urlToImage + '" class="img"</div>')
+        $(this).append('<div class="container"><img src="' + articles[id_vesti].urlToImage + '" >')
           .append('<p>' + articles[id_vesti].description + '</p>')
-          /* .append('<a id="save_news" class="zatamni"> Save </a>') */
-          .append('<a href="' + articles[id_vesti].url + '" target="_blank" class="zatamni"> Read more... </a>')
+          .append('<a id="save_news" class="zatamni"> <i class="fa fa-star"></i> Save </a>')
+          .append('<a href="' + articles[id_vesti].url + '" target="_blank" id="readMore" class="zatamni"> Read more... </a>')
+          .append('</div>')
           .slideDown(300);
       });
     }
+
+  });
+
+  $('#ajax_headlines_list').on('click', '#save_news', function () {
+
+    //alert(obradi_naslov($(this).closest('li').children('.naslov').html()));
+    naslov = obradi_naslov($(this).closest('li').children('.naslov').html());
+    
+    //alert($(this).closest('li').children('p').html());
+    opis = $(this).closest('li').children('p').html();
+
+    //alert($(this).closest('li').children('#readMore').attr('href'));
+    url_ka_vesti = $(this).closest('li').children('#readMore').attr('href');
+
+    //alert(obradi_url($(this).closest('li').children('.container').html()));
+    url_ka_slici = obradi_url($(this).closest('li').children('.container').html());
+
+    //ovo treba da se upakuje u jedan paket i da se posalje serveru
+
+    var package = {};
+    package["headline"] = naslov;
+    package["description"] = opis;
+    package["url_headline"] = url_ka_vesti;
+    package["url_img"] = url_ka_slici;
+
+    //console.log(package);
+    post_ajax('http://localhost:8000', JSON.stringify(package), data_ok_saving, data_not_ok_saving);
 
   });
 
