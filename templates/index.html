@@ -94,7 +94,7 @@
         </div>
 
         <div class="dropdown">
-            <button class="dropbtn" id="btnSortBy"> Sort by <i class="fa fa-caret-down"> </i> </button>
+            <button class="dropbtn" id="btnSortBy" disabled > Sort by <i class="fa fa-caret-down"> </i> </button>
             <div class="dropdown-content">
                 <a><input type="radio" id="srtNto" name="sorting" value="nto" class="radio" disabled checked> Date: new to old <br></a>
                 <a><input type="radio" id="srtOtn" name="sorting" value="otn" class="radio" disabled> Date: old to new <br></a>
@@ -115,37 +115,12 @@
 
 
 
-<!-- 
-<form method="POST">
-    <h3> Choose a country: </h3>
-    <fieldset id="group1">
-        <input type="radio" name="country" value="rs" class="radio" checked> Serbia <br>
-        <input type="radio" name="country" value="ar" class="radio"> Argentina <br>
-        <input type="radio" name="country" value="au" class="radio"> Australia <br>
-        <input type="radio" name="country" value="at" class="radio"> Austria <br>
-        <input type="radio" name="country" value="be" class="radio"> Belgium <br>
-        <input type="radio" name="country" value="gb" class="radio"> Great Britain <br>
-        <input type="radio" name="country" value="us" class="radio"> United States of America <br>
-    </fieldset>
 
-    <h3> Choose a category: </h3>
-    <fieldset id="group2">
-        <input type="radio" name="category" value="general" class="radio" checked> General <br>
-        <input type="radio" name="category" value="entertainment" class="radio"> Entertainment <br>
-        <input type="radio" name="category" value="business" class="radio"> Business <br>
-        <input type="radio" name="category" value="health" class="radio"> Health <br>
-        <input type="radio" name="category" value="science" class="radio"> Science <br>
-        <input type="radio" name="category" value="sports" class="radio"> Sports <br>
-        <input type="radio" name="category" value="technology" class="radio"> Technology <br>
-    </fieldset>
-    <br>
-    <input id="btnSend" type="submit" class="btn" value="Send">
-</form> -->
 
 <div id="ajax_headlines">
     <h2 id="ajax_title" class="sakrij">Top headlines:</h2>
-    <div class="container sakrij" id="panel_top_headlines">
-    </div>
+    <!-- <div class="container sakrij" id="panel_top_headlines">
+    </div> -->
 
     <ul id="ajax_headlines_list">
     </ul>

@@ -311,6 +311,16 @@ $(function () {
 
   }
 
+  function data_ok_timer(){
+    alert('You have successfully changed refreshing timer.');
+  }
+
+  function data_not_ok_timer(){
+
+  }
+
+
+
 
 
 
@@ -371,6 +381,10 @@ $(function () {
   });
 
   $('#ajax_headlines_list').on('click', '#save_news', function () {
+
+    //$(this).children('i').toggleClass('icon_c');
+
+    //ODKOMENTARISI POST_AJAX OVDE
 
     //alert(obradi_naslov($(this).closest('li').children('.naslov').html()));
     naslov = obradi_naslov($(this).closest('li').children('.naslov').html());
@@ -446,6 +460,23 @@ $(function () {
       $('#ajax_headlines_list li').sort(sort_li_desc).appendTo('#ajax_headlines_list');
       $('#ajax_headlines_list').slideDown(400);
     });
+  });
+
+
+  $('#timerList').on('click', function(){
+
+    var $timer = $('#timerGroup :checked');
+    //alert($timer.val())
+
+    posiljka = {};
+    posiljka['timer']=$timer.val();
+
+    //alert(posiljka['timer']);
+
+    post_ajax('http://localhost:8000', JSON.stringify(posiljka), data_ok_timer, data_not_ok_timer);
+    
+    
+
   });
 
 

@@ -1,34 +1,46 @@
-<!DOCTYPE html>
-<html>
+{% extends "main.html" %}
 
-<head>
-    <title>Log In</title>
-</head>
+{% block body %}
 
 <body>
     <div id="login-form">
         <form action="/login" method="POST">
             <fieldset>
-                <label for="username">Username</label>
-                <input name="username" type="text" value="">
+
+                <div class="input-group margin-bottom-sm">
+                    <span for="username"><i class="fa fa-user fa-fw"></i></span>
+                    <input class="form-control" name="username" type="text" value="" placeholder="Username">
+                </div>
+
             </fieldset>
 
             <fieldset>
-                <label for="password">Password</label>
-                <input name="password" type="password" value="">
+                <div class="input-group margin-bottom-sm">
+                    <span for="password"><i class="fa fa-key fa-fw"></i></span>
+                    <input class="form-control" name="password" type="password" value="" placeholder="Password">
+                </div>
             </fieldset>
-            <input type="submit" value="Log In">
+            
+            <input type="submit" class="btn" value="Log In">
 
         </form>
     </div>
+
+    <br>
 
     <div>
         <form action="/login" method = "POST">
-            <button name="btnSignIn" class="btn" id="btnSignIn"> Sign Up </button>
+            <div class="input-group margin-bottom-sm">
+                <label for="btnSignIn">Don't have an account?</label>
+                <button name="btnSignIn" id="btnSignIn" class="btnSignIn"> Sign Up </button>
+            </div>
         </form>
     </div>
+
+    <br>
 
 </body>
 
 
-</html>
+
+{% end %}

@@ -21,7 +21,7 @@ from tornado.options import define, options
 define("port",default=8000, help="run on the given port", type=int)
 
 my_client = ''
-
+timer = 600
 
 
 async def do_find_one(collection,value1,value2):
@@ -60,11 +60,25 @@ class ProfileHandler(BaseHandler):
 
     
     def post(self):
-        if(self.get_argument("logout",None)!=None):
+
+        if self.get_argument("btn1",None) != None:
+            print("detektovan klik na btn Profile")
+            self.redirect("/profile")
+        
+        if self.get_argument("btn2", None) != None:
+            print("detektovan klik na btn Sources")
+            self.redirect("/sources")
+            return
+
+
+        if self.get_argument("logout",None) != None:
             print("unutar if-a logout-a")
             global my_client
             my_client = ''
             self.redirect("/")
+
+            
+        
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -75,6 +89,15 @@ class LoginHandler(BaseHandler):
         if self.get_argument("btnSignIn",None) != None:
             print("detektovan klik na btnSignIn")
             self.redirect("/signin")
+        
+        if self.get_argument("btn1",None) != None:
+            print("detektovan klik na btn Profile")
+            self.redirect("/profile")
+        
+        if self.get_argument("btn2", None) != None:
+            print("detektovan klik na btn Sources")
+            self.redirect("/sources")
+            return
         
         db = self.settings['db']
         collection = db.test
@@ -102,6 +125,17 @@ class SigninHandler(BaseHandler):
         self.render('signin.html')
     
     async def post(self):
+
+        if self.get_argument("btn1",None) != None:
+            print("detektovan klik na btn Profile")
+            self.redirect("/profile")
+        
+        if self.get_argument("btn2", None) != None:
+            print("detektovan klik na btn Sources")
+            self.redirect("/sources")
+            return
+
+
         db = self.settings['db']
         collection = db.test
 
@@ -254,6 +288,8 @@ class MainHandler(tornado.web.RequestHandler):
         print(dic_data)
         print('---'*26)
 
+        global timer
+
 
         if("headline" in dic_data):
             print("detektovao sam zahtev za cuvanjem jedne vesti")
@@ -280,8 +316,13 @@ class MainHandler(tornado.web.RequestHandler):
                 print('azurirana lista vesti trenutnog klijenta')
             else:
                 print("greska pri upisu u bazu")
-
-        else:
+        
+        elif 'timer' in dic_data:
+            #print(dic_data['timer'])
+            
+            timer = int(dic_data['timer'])
+        
+        elif 'country' in dic_data:
             print("detektovao sam zahtev za potragom vesi")
 
 
@@ -309,7 +350,7 @@ class MainHandler(tornado.web.RequestHandler):
                 #cekaj recimo pet minuta
                 #10s sam stavio da vidim kako radi
                 print('ceka odredjeno vreme na proveru')
-                self.sleeping_client = asyncio.sleep(600)
+                self.sleeping_client = asyncio.sleep(timer)
                 await self.sleeping_client
                 print("okay done now")
             
@@ -349,6 +390,9 @@ class MainHandler(tornado.web.RequestHandler):
             self.write(json.dumps({'sent': podaci1}))
 
             print('dosli smo do kraja puta')
+        
+        else:
+            print('nepoznat zahtev')
 
     
     
