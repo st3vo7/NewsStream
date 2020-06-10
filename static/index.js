@@ -302,9 +302,17 @@ $(function () {
     window.setTimeout(post_ajax.bind(null, "http://localhost:8000", JSON.stringify(sending_parameters), data_ok, data_not_ok), errorSleepTime);
   }
 
-  function data_ok_saving(){
-    //alert($(this).closest('li').children('.naslov').html());
-    //postavi zvezdicu da bude plava
+  function data_ok_saving(data){
+    obj = JSON.parse(data);
+    //console.log(obj);
+
+    var rez = obj.sent;
+    //alert(rez);
+    if(rez == 'redirekt'){
+      alert("For this action you need to be logged in.");
+      window.location.replace("http://localhost:8000/login");
+    }
+    
   }
 
   function data_not_ok_saving(){
@@ -372,7 +380,7 @@ $(function () {
         $(this).append('<div class="container"><img src="' + articles[id_vesti].urlToImage + '" >')
           .append('<p>' + articles[id_vesti].description + '</p>')
           .append('<a id="save_news" class="zatamni"> <i class="fa fa-star"></i> Save </a>')
-          .append('<a href="' + articles[id_vesti].url + '" target="_blank" id="readMore" class="zatamni"> Read more... </a>')
+          .append('<a id="readMore" href="' + articles[id_vesti].url + '" target="_blank" class="zatamni"> Read more... </a>')
           .append('</div>')
           .slideDown(300);
       });
@@ -380,9 +388,19 @@ $(function () {
 
   });
 
-  $('#ajax_headlines_list').on('click', '#save_news', function () {
+  $('#ajax_headlines_list').on('click', '#readMore', function (e) {
 
-    //$(this).children('i').toggleClass('icon_c');
+    e.stopImmediatePropagation();
+    //off ili click(function() {return false;});
+  
+  });
+
+  $('#ajax_headlines_list').on('click', '#save_news', function (e) {
+
+    
+    e.stopImmediatePropagation();
+
+    $(this).children('i').toggleClass('icon_c');
 
     //ODKOMENTARISI POST_AJAX OVDE
 

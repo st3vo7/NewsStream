@@ -55,7 +55,17 @@ class BaseHandler(tornado.web.RequestHandler):
 class ProfileHandler(BaseHandler):
 
     @tornado.web.authenticated
-    def get(self):
+    async def get(self):
+
+        db = self.settings['db']
+        collection = db.test
+
+        username = my_client['name']
+        password = my_client['password']
+
+        v1 = await do_find_one(collection,username,password)
+        print(v1)
+        
         self.render('profile.html', user=self.current_user)
 
     
@@ -297,7 +307,13 @@ class MainHandler(tornado.web.RequestHandler):
             collection = db.test
 
             global my_client
+            #print('my_client: '+ my_client)
 
+            if my_client == '':
+                print('my_client je prazno')
+                self.write(json.dumps({'sent': 'redirekt'}))
+                return
+            
             username = my_client['name']
             print('username: '+username)
 

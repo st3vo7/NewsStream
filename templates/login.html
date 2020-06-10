@@ -3,6 +3,14 @@
 {% block body %}
 
 <body>
+
+    <div class="navbar">
+        <a href="http://localhost:8000/">
+            <img src="static/images/logo1.png" alt="NewsStream" width="60px" height="55px">
+        </a>
+
+    </div>
+    
     <div id="login-form">
         <form action="/login" method="POST">
             <fieldset>
@@ -20,7 +28,7 @@
                     <input class="form-control" name="password" type="password" value="" placeholder="Password">
                 </div>
             </fieldset>
-            
+
             <input type="submit" class="btn" value="Log In">
 
         </form>
@@ -29,7 +37,7 @@
     <br>
 
     <div>
-        <form action="/login" method = "POST">
+        <form action="/login" method="POST">
             <div class="input-group margin-bottom-sm">
                 <label for="btnSignIn">Don't have an account?</label>
                 <button name="btnSignIn" id="btnSignIn" class="btnSignIn"> Sign Up </button>
