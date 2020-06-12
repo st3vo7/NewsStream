@@ -12,6 +12,7 @@ import tornado.escape
 import tornado.locks
 import tornado.httpclient
 
+
 import motor.motor_tornado
 
 
@@ -36,7 +37,11 @@ async def do_insert(collection, value1, value2):
 
 async def do_insert_headlines(collection, name, password, value1, value2, value3, value4):
     document = {"headline" : value1, "description" : value2, "url_headline" : value3, "url_img" : value4}
-    result = await collection.update_one({"name" : name, "password" : password} , {'$push' : {"headlines" : document } })
+    result = await collection.update_one({"name" : name, "password" : password} , {'$push' : {"headlines" : document }})
+    return result
+
+async def do_delete_one(collection, name, password, headline):
+    result = await collection.update_one({"name" : name, "password" : password},{ '$pull' : { "headlines" : { "headline" : headline }}})
     return result
 
 
@@ -63,13 +68,20 @@ class ProfileHandler(BaseHandler):
         username = my_client['name']
         password = my_client['password']
 
+        #nadji ga u bazi
         v1 = await do_find_one(collection,username,password)
-        print(v1)
-        
-        self.render('profile.html', user=self.current_user)
+        #pprint.pprint(v1)
+
+        #izvuci njegove vesti i renderuj ih na stranici
+        headlines = v1['headlines']
+        #pprint.pprint(headlines)
+
+        self.render('profile.html', user=self.current_user,headlines=headlines)
 
     
-    def post(self):
+    async def post(self):
+
+        global my_client
 
         if self.get_argument("btn1",None) != None:
             print("detektovan klik na btn Profile")
@@ -83,9 +95,36 @@ class ProfileHandler(BaseHandler):
 
         if self.get_argument("logout",None) != None:
             print("unutar if-a logout-a")
-            global my_client
+            
             my_client = ''
             self.redirect("/")
+        
+
+        print('---'*26)
+        dic_data = tornado.escape.json_decode(self.request.body)
+        print(dic_data)
+        print('---'*26)
+
+        
+
+        if 'article' in dic_data:
+
+            db = self.settings['db']
+            collection = db.test
+        
+            username = my_client['name']
+            password = my_client['password']
+            headline = dic_data['article']
+            id_headline = dic_data['id_article']
+
+            v1 = await do_delete_one(collection,username,password,headline)
+            print("result %s" %repr(v1))
+            self.write(json.dumps({'sent': id_headline}))
+
+
+
+        
+        
 
             
         
@@ -332,6 +371,8 @@ class MainHandler(tornado.web.RequestHandler):
                 print('azurirana lista vesti trenutnog klijenta')
             else:
                 print("greska pri upisu u bazu")
+            
+            self.write(json.dumps({'sent': 'upisano'}))
         
         elif 'timer' in dic_data:
             #print(dic_data['timer'])

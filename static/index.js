@@ -7,6 +7,7 @@ $(function () {
   var errorSleepTime = 500;
   var sending_parameters;
   var tmp_list_url = [];
+  var articles;
 
 
 
@@ -186,7 +187,7 @@ $(function () {
     //alert(sending_parameters.initial_request);
 
 
-    var articles = obj.sent.articles;
+    articles = obj.sent.articles;
 
     if (sending_parameters.initial_request) {
 
@@ -310,7 +311,14 @@ $(function () {
     //alert(rez);
     if(rez == 'redirekt'){
       alert("For this action you need to be logged in.");
-      window.location.replace("http://localhost:8000/login");
+      //window.location.replace("http://localhost:8000/login");
+      window.open('http://localhost:8000/login', '_blank');
+    }
+
+    else{
+      //znaci da je klijent vec bio ulogovan, vest smo sacuvali
+      //ostaje da obojimo zvezdicu u plavo
+      $('#save_news').children('i').toggleClass('icon_c');
     }
     
   }
@@ -327,7 +335,27 @@ $(function () {
 
   }
 
+  function data_ok_deletion(data){
+    alert('You have successfully removed news.');
+    //treba je skloniti sa liste
+    obj = JSON.parse(data);
+    console.log(obj);
+    $('#'+obj.sent).closest('li').remove();
 
+  }
+
+  function data_not_ok_deletion(){
+
+  }
+
+
+
+  $('#articles_list').on('click', '.listica', function(){
+    //alert($(this).attr('id'));
+    $(this).children('#profile_news').toggleClass('sakrij');
+
+
+  });
 
 
 
@@ -335,7 +363,7 @@ $(function () {
   $('#ajax_headlines_list').on('click', '.listica', function () {
     //alert($(this).closest('li')[0].id);
 
-    var articles = obj.sent.articles;
+    //articles = obj.sent.articles;
     //alert(articles[0].title);
     console.log(articles);
     //console.log(articles[0].title);
@@ -377,14 +405,38 @@ $(function () {
         var id_vesti = izvuci_broj($kliknuta_lista[0].id);
         //alert(id_vesti);
 
-        $(this).append('<div class="container"><img src="' + articles[id_vesti].urlToImage + '" >')
+        $(this).append('<div class="container"><img src="' + articles[id_vesti].urlToImage + '" ></div>')
           .append('<p>' + articles[id_vesti].description + '</p>')
           .append('<a id="save_news" class="zatamni"> <i class="fa fa-star"></i> Save </a>')
           .append('<a id="readMore" href="' + articles[id_vesti].url + '" target="_blank" class="zatamni"> Read more... </a>')
-          .append('</div>')
+          //.append('</div>')
           .slideDown(300);
       });
     }
+
+  });
+
+
+  $('#articles_list').on('click', '#btnRemove', function(e){
+    
+    e.stopImmediatePropagation();
+
+    //alert($(this).closest('li').children('.naslov').html());
+    var vest = $(this).closest('li').children('.naslov').html();
+    var id_vesti = $(this).closest('li').attr('id');
+
+    //ostaje da posaljes serveru ime korisnika i naslov vesti
+    //alert($('.username').html());
+    //var korisnik = $('.username').html();
+
+    var package = {};
+    package['article'] = vest;
+    package['id_article'] = id_vesti;
+    //package['username'] = korisnik;
+
+    post_ajax('http://localhost:8000/profile', JSON.stringify(package), data_ok_deletion, data_not_ok_deletion);
+
+    
 
   });
 
@@ -400,7 +452,7 @@ $(function () {
     
     e.stopImmediatePropagation();
 
-    $(this).children('i').toggleClass('icon_c');
+    //$(this).children('i').toggleClass('icon_c');
 
     //ODKOMENTARISI POST_AJAX OVDE
 

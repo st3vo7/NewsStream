@@ -4,33 +4,38 @@
 
 
 <body>
-    
+
     <form method="POST">
         <div class="navbar">
             <a href="http://localhost:8000/">
                 <img src="static/images/logo1.png" alt="NewsStream" width="60px" height="55px">
             </a>
-            
+
 
             <div class="dropdown" style="margin-left: 2px;">
-                <button class="dropbtn" id="btnTimer" disabled > Refresh time <i class="fa fa-caret-down"> </i> </button>
+                <button class="dropbtn" id="btnTimer" disabled> Refresh time <i class="fa fa-caret-down"> </i> </button>
                 <div id="timerList" class="dropdown-content">
                     <fieldset id="timerGroup">
-                        <a><input type="radio" id="rfrFive" name="refreshing" value="300" class="radio"  > 5 min <br></a>
-                        <a><input type="radio" id="rfrTen" name="refreshing" value="600" class="radio" checked > 10 min <br></a>
-                        <a><input type="radio" id="rfrFifteen" name="refreshing" value="900" class="radio"  > 15 min <br></a>
-                        <a><input type="radio" id="rfrThirty" name="refreshing" value="1800" class="radio"  > 30 min <br></a>
-                        <a><input type="radio" id="rfrSixty" name="refreshing" value="3600" class="radio"  > 1 hr <br></a>
+                        <a><input type="radio" id="rfrFive" name="refreshing" value="300" class="radio"> 5 min <br></a>
+                        <a><input type="radio" id="rfrTen" name="refreshing" value="600" class="radio" checked> 10 min
+                            <br></a>
+                        <a><input type="radio" id="rfrFifteen" name="refreshing" value="900" class="radio"> 15 min
+                            <br></a>
+                        <a><input type="radio" id="rfrThirty" name="refreshing" value="1800" class="radio"> 30 min
+                            <br></a>
+                        <a><input type="radio" id="rfrSixty" name="refreshing" value="3600" class="radio"> 1 hr <br></a>
                     </fieldset>
-                    
+
                 </div>
             </div>
 
 
-            
+
             <a style="float: right;"><input type="submit" class="btn" value="Log Out" name="logout"></a>
 
-            <div style="text-align: center; height: 45px;  float: right;"><p class="username">{{ user }}</p></div>
+            <div style="text-align: center; height: 45px;  float: right;">
+                <p class="username">{{ user }}</p>
+            </div>
 
 
         </div>
@@ -41,12 +46,28 @@
 
     <h1>List of saved articles:</h1>
 
+    <p style="display: none;">{{ ind = 0 }}</p>
+
     <div id="saved_articles">
         <ul id="articles_list">
+            {% for h in headlines %}
+            
+            <li class="listica" id="profile_headline{{ind}}">
+                <a class="naslov">{{ h['headline'] }}</a>
+                <a id="btnRemove" class="btn_remove btn-danger"><i class="fa fa-trash-o fa-lg"></i></a>
+
+                <div id="profile_news" class="sakrij">
+                    <div class="container"><img src={{ h['url_img'] }}></div>
+                    <p>{{ h['description']  }}</p>
+                    <a class="zatamni" target="_blank" href="{{h['url_headline']}}">Read more...</a>
+                </div>
+            </li>
+            <p style="display: none;">{{ind=ind+1}}</p>
+            {% end %}
         </ul>
     </div>
 
-    
+
     <br>
 
 
