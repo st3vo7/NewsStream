@@ -25,9 +25,14 @@ my_client = ''
 timer = 600
 
 
-async def do_find_one(collection,value1,value2):
-    document = await collection.find_one({"name" : value1, "password" : value2 })
+async def do_find_one(collection,value1):
+    document = await collection.find_one({"name" : value1})
     return document
+
+async def do_check_one(collection,value1, value2):
+    document = await collection.find_one({"name" : value1, "password" : value2})
+    return document
+
 
 
 async def do_insert(collection, value1, value2):
@@ -40,8 +45,8 @@ async def do_insert_headlines(collection, name, password, value1, value2, value3
     result = await collection.update_one({"name" : name, "password" : password} , {'$push' : {"headlines" : document }})
     return result
 
-async def do_delete_one(collection, name, password, headline):
-    result = await collection.update_one({"name" : name, "password" : password},{ '$pull' : { "headlines" : { "headline" : headline }}})
+async def do_delete_one(collection, name, headline):
+    result = await collection.update_one({"name" : name},{ '$pull' : { "headlines" : { "headline" : headline }}})
     return result
 
 
@@ -50,12 +55,20 @@ async def do_delete_one(collection, name, password, headline):
 class BaseHandler(tornado.web.RequestHandler):
 
     def get_current_user(self):
-        
+        '''
         if(my_client != ''):
             return my_client['name']
         else:
             return None
-        
+        '''
+        a =  self.get_secure_cookie("username")
+
+        if a:
+            print('***' * 15)
+            print(a.decode("utf-8"))
+            print('***' * 15)
+            return a.decode("utf-8")
+        return None
 
 class ProfileHandler(BaseHandler):
 
@@ -64,19 +77,28 @@ class ProfileHandler(BaseHandler):
 
         db = self.settings['db']
         collection = db.test
-
-        username = my_client['name']
-        password = my_client['password']
+        
+        username = self.current_user
+        
+        print(username)
+        #print("username: " + username)
+        
 
         #nadji ga u bazi
-        v1 = await do_find_one(collection,username,password)
+        v1 = await do_find_one(collection,username)
         #pprint.pprint(v1)
 
-        #izvuci njegove vesti i renderuj ih na stranici
-        headlines = v1['headlines']
-        #pprint.pprint(headlines)
+        if v1 != None:
 
-        self.render('profile.html', user=self.current_user,headlines=headlines)
+            #izvuci njegove vesti i renderuj ih na stranici
+            headlines = v1['headlines']
+            #pprint.pprint(headlines)
+
+            self.render('profile.html', user=self.current_user,headlines=headlines)
+        
+        else:
+            print('Nepostojeci klijent.')
+        
 
     
     async def post(self):
@@ -95,8 +117,10 @@ class ProfileHandler(BaseHandler):
 
         if self.get_argument("logout",None) != None:
             print("unutar if-a logout-a")
-            
+            '''
             my_client = ''
+            '''
+            self.clear_cookie("username")
             self.redirect("/")
         
 
@@ -111,23 +135,20 @@ class ProfileHandler(BaseHandler):
 
             db = self.settings['db']
             collection = db.test
-        
+            
+            '''
             username = my_client['name']
             password = my_client['password']
+            '''
+            username = self.current_user
             headline = dic_data['article']
             id_headline = dic_data['id_article']
 
-            v1 = await do_delete_one(collection,username,password,headline)
+            v1 = await do_delete_one(collection,username,headline)
             print("result %s" %repr(v1))
             self.write(json.dumps({'sent': id_headline}))
 
 
-
-        
-        
-
-            
-        
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -147,24 +168,36 @@ class LoginHandler(BaseHandler):
             print("detektovan klik na btn Sources")
             self.redirect("/sources")
             return
-        
+        '''
         db = self.settings['db']
         collection = db.test
+        '''
 
         username = self.get_argument("username")
         password = self.get_argument("password")
+        
 
-        val = await do_find_one(collection,username,password)
+        self.set_secure_cookie("username", username)
+
+        
+        val = await do_check_one(collection,username,password)
         print('***'*15)
         print(val)
         print('***'*15)
-
+        
+        
         if(val!= None):
+            
+            '''
             global my_client
             my_client = val
+            '''
+
             self.redirect("/profile")
         else:
-            self.write('<h1>Nepostojeci klijent</h1>')
+            self.write('<h1>Pogresni kredencijali</h1>')
+        
+
 
 
 
@@ -192,16 +225,20 @@ class SigninHandler(BaseHandler):
         password = self.get_argument("password")
         email = self.get_argument("email")
 
+        self.set_secure_cookie("username", username)
+
         val1 = await do_insert(collection,username,password)
         print("result %s" %repr(val1.inserted_id))
 
         if(val1 != None):
+            '''
             global my_client
-
             #potrazuje upisanog iz baze
             val = await do_find_one(collection,username,password)
             my_client = val
+            '''
             self.redirect("/profile")
+
         else:
             print("greska pri upisu u bazu")
 
@@ -494,9 +531,11 @@ if __name__ == '__main__':
     settings = {
         "template_path" : os.path.join(os.path.dirname(__file__),"templates"),
         "static_path" : os.path.join(os.path.dirname(__file__),"static"),
+        "cookie_secret" : "s8iJWyTeSQ+Hfgj59nTy4bFKahPdAEnbhsH5CRuUN1g=",
         "login_url" : "/login",
         "db" : db,
-        "debug" : True
+        "debug" : True,
+        "xsrf_cookies" : True
 
     }
 

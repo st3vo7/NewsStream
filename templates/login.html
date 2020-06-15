@@ -31,6 +31,8 @@
 
             <input type="submit" class="btn" value="Log In">
 
+            {% module xsrf_form_html() %}
+
         </form>
     </div>
 
@@ -42,6 +44,8 @@
                 <label for="btnSignIn">Don't have an account?</label>
                 <button name="btnSignIn" id="btnSignIn" class="btnSignIn"> Sign Up </button>
             </div>
+
+            {% module xsrf_form_html() %}
         </form>
     </div>
 
