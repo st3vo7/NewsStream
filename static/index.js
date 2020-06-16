@@ -23,6 +23,19 @@ $(function () {
   function obradi_url(data){
     return data.split('"')[1]
   }
+  
+  function get_cookie(name){
+    
+    var c = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+    //alert(c[1]);
+    return c ? c[1] : undefined;
+
+    /* var b = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    alert(b.pop())
+    return b ? b.pop() : ''; */
+
+  }
+
 
 
   $('#btnSources').on('click', function (e) {
@@ -50,6 +63,8 @@ $(function () {
     }
 
     package.initial_request = true;
+     
+
     sending_parameters = package;
 
 
@@ -125,6 +140,10 @@ $(function () {
     }
 
     package.initial_request = true;
+     
+
+    console.log(package);
+
     //da bih mogao da ga koristim ponovo u data_ok, jer package nije vidljiv van ove f-je
     sending_parameters = package;
 
@@ -159,15 +178,21 @@ $(function () {
 
 
   function post_ajax(url, data, success_function, failure_function) {
+    var token = get_cookie("_xsrf");
+    //alert(token);
 
     $.ajax({
       type: 'POST',
       url: url,
+      headers : {
+        'X-XSRFToken' : token
+      },
       data: data,
       contentType: "json",
       success: success_function,
       error: failure_function
     });
+    
 
   }
 
@@ -432,6 +457,7 @@ $(function () {
     var package = {};
     package['article'] = vest;
     package['id_article'] = id_vesti;
+     
     //package['username'] = korisnik;
 
     post_ajax('http://localhost:8000/profile', JSON.stringify(package), data_ok_deletion, data_not_ok_deletion);
@@ -475,6 +501,7 @@ $(function () {
     package["description"] = opis;
     package["url_headline"] = url_ka_vesti;
     package["url_img"] = url_ka_slici;
+     
 
     //console.log(package);
     post_ajax('http://localhost:8000', JSON.stringify(package), data_ok_saving, data_not_ok_saving);
@@ -536,14 +563,15 @@ $(function () {
   $('#timerList').on('click', function(){
 
     var $timer = $('#timerGroup :checked');
-    //alert($timer.val())
+    alert($timer.val())
 
-    posiljka = {};
-    posiljka['timer']=$timer.val();
+    var package = {};
+    package['timer']=$timer.val();
+     
 
     //alert(posiljka['timer']);
 
-    post_ajax('http://localhost:8000', JSON.stringify(posiljka), data_ok_timer, data_not_ok_timer);
+    post_ajax('http://localhost:8000', JSON.stringify(package), data_ok_timer, data_not_ok_timer);
     
     
 

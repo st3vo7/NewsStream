@@ -6,6 +6,9 @@
 
 
 <form method="POST">
+
+    {% module xsrf_form_html() %}
+    
     <div class="navbar">
 
         <a href="http://localhost:8000/">
@@ -109,10 +112,9 @@
         
         <a style="float: right;"><input id="btnSend" type="submit" class="btn" value="Send" disabled='disable'> </a>
 
-
     </div>
 
-    {% module xsrf_form_html() %}
+    
 </form>
 
 

@@ -20,8 +20,9 @@ import motor.motor_tornado
 
 from tornado.options import define, options
 define("port",default=8000, help="run on the given port", type=int)
-
+'''
 my_client = ''
+'''
 timer = 600
 
 
@@ -36,17 +37,21 @@ async def do_check_one(collection,value1, value2):
 
 
 async def do_insert(collection, value1, value2):
-    document = {"name" : value1, "password" : value2, "headlines": []}
+    document = {"name" : value1, "password" : value2, "headlines": [], "timer" : 600}
     result = await collection.insert_one(document)
     return result
 
-async def do_insert_headlines(collection, name, password, value1, value2, value3, value4):
+async def do_insert_headlines(collection, name, value1, value2, value3, value4):
     document = {"headline" : value1, "description" : value2, "url_headline" : value3, "url_img" : value4}
-    result = await collection.update_one({"name" : name, "password" : password} , {'$push' : {"headlines" : document }})
+    result = await collection.update_one({"name" : name} , {'$push' : {"headlines" : document }})
     return result
 
 async def do_delete_one(collection, name, headline):
     result = await collection.update_one({"name" : name},{ '$pull' : { "headlines" : { "headline" : headline }}})
+    return result
+
+async def do_alter_timer(collection, name, timer_value):
+    result = await collection.update_one({"name" : name}, {'$set' : {"timer" : timer_value}})
     return result
 
 
@@ -103,7 +108,9 @@ class ProfileHandler(BaseHandler):
     
     async def post(self):
 
+        '''
         global my_client
+        '''
 
         if self.get_argument("btn1",None) != None:
             print("detektovan klik na btn Profile")
@@ -122,6 +129,7 @@ class ProfileHandler(BaseHandler):
             '''
             self.clear_cookie("username")
             self.redirect("/")
+            return
         
 
         print('---'*26)
@@ -225,10 +233,17 @@ class SigninHandler(BaseHandler):
         password = self.get_argument("password")
         email = self.get_argument("email")
 
-        self.set_secure_cookie("username", username)
+        val = await do_find_one(collection,username)
+        
+        if val:
+            self.write('Username already exists. Please choose other one.')
+            return
+            
 
         val1 = await do_insert(collection,username,password)
         print("result %s" %repr(val1.inserted_id))
+
+        self.set_secure_cookie("username", username)
 
         if(val1 != None):
             '''
@@ -241,11 +256,13 @@ class SigninHandler(BaseHandler):
 
         else:
             print("greska pri upisu u bazu")
+        
+        
 
 
 
 
-class SourceHandler(tornado.web.RequestHandler):
+class SourceHandler(BaseHandler):
     def get(self):
 
         self.render("sources.html",
@@ -297,7 +314,18 @@ class SourceHandler(tornado.web.RequestHandler):
 
         if(not initial_request):
             print('cekaj malo dok proveris')
-            self.sleeping_client = asyncio.sleep(600)
+
+            timer = 600
+            if self.current_user != None:
+                #dakle ulogovan je, onda citaj tajmer iz baze
+                #inace je 600
+                db = self.settings['db']
+                collection = db.test
+
+                v1 = await do_find_one(collection, self.current_user)
+                timer = v1['timer']
+
+            self.sleeping_client = asyncio.sleep(timer)
             await self.sleeping_client
             print('gotovo cekanje')
         
@@ -345,7 +373,7 @@ class SourceHandler(tornado.web.RequestHandler):
         print('***'*15)
 
 
-class MainHandler(tornado.web.RequestHandler):
+class MainHandler(BaseHandler):
 
     def get(self):
          
@@ -374,14 +402,15 @@ class MainHandler(tornado.web.RequestHandler):
         print(dic_data)
         print('---'*26)
 
+        '''
         global timer
-
+        '''
 
         if("headline" in dic_data):
             print("detektovao sam zahtev za cuvanjem jedne vesti")
             db = self.settings['db']
             collection = db.test
-
+            '''
             global my_client
             #print('my_client: '+ my_client)
 
@@ -389,19 +418,25 @@ class MainHandler(tornado.web.RequestHandler):
                 print('my_client je prazno')
                 self.write(json.dumps({'sent': 'redirekt'}))
                 return
-            
-            username = my_client['name']
+            '''
+
+            username = self.current_user
+            print(username)
+
+            if username == None:
+                print('nemam trenutno aktivnog klijenta')
+                self.write(json.dumps({'sent': 'redirekt'}))
+                return
+
             print('username: '+username)
 
-            password = my_client['password']
-            print('password: '+password)
             
             headline = dic_data['headline']
             description = dic_data['description']
             url_headline = dic_data['url_headline']
             url_img = dic_data['url_img']
 
-            val1 = await do_insert_headlines(collection,username, password, headline, description, url_headline, url_img)
+            val1 = await do_insert_headlines(collection,username, headline, description, url_headline, url_img)
             
 
             if(val1 != None):
@@ -413,8 +448,19 @@ class MainHandler(tornado.web.RequestHandler):
         
         elif 'timer' in dic_data:
             #print(dic_data['timer'])
+            db = self.settings['db']
+            collection = db.test
             
             timer = int(dic_data['timer'])
+
+            username = self.current_user
+
+            val = await do_alter_timer(collection,username,timer)
+
+            if(val!= None):
+                print('azuriran tajmer')
+            else:
+                print('greska pri azuriranju tajmera')
         
         elif 'country' in dic_data:
             print("detektovao sam zahtev za potragom vesi")
@@ -429,6 +475,11 @@ class MainHandler(tornado.web.RequestHandler):
             a=dic_data['country']
             b=dic_data['category']
             initial_request = dic_data['initial_request']
+            '''
+            self.xsrf_token = dic_data['_xsrf']
+            print(self.xsrf_token)
+            '''
+
             c=''
 
             if('keyword' in dic_data):
@@ -444,6 +495,18 @@ class MainHandler(tornado.web.RequestHandler):
                 #cekaj recimo pet minuta
                 #10s sam stavio da vidim kako radi
                 print('ceka odredjeno vreme na proveru')
+
+                timer = 600
+
+                if self.current_user != None:
+                    #dakle ulogovan je, onda citaj tajmer iz baze
+                    #inace je 600
+                    db = self.settings['db']
+                    collection = db.test
+
+                    v1 = await do_find_one(collection, self.current_user)
+                    timer = v1['timer']
+
                 self.sleeping_client = asyncio.sleep(timer)
                 await self.sleeping_client
                 print("okay done now")
