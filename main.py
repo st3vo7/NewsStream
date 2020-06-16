@@ -16,14 +16,8 @@ import tornado.httpclient
 import motor.motor_tornado
 
 
-
-
 from tornado.options import define, options
 define("port",default=8000, help="run on the given port", type=int)
-'''
-my_client = ''
-'''
-timer = 600
 
 
 async def do_find_one(collection,value1):
@@ -33,7 +27,6 @@ async def do_find_one(collection,value1):
 async def do_check_one(collection,value1, value2):
     document = await collection.find_one({"name" : value1, "password" : value2})
     return document
-
 
 
 async def do_insert(collection, value1, value2):
@@ -55,17 +48,9 @@ async def do_alter_timer(collection, name, timer_value):
     return result
 
 
-
-
 class BaseHandler(tornado.web.RequestHandler):
 
     def get_current_user(self):
-        '''
-        if(my_client != ''):
-            return my_client['name']
-        else:
-            return None
-        '''
         a =  self.get_secure_cookie("username")
 
         if a:
@@ -108,13 +93,10 @@ class ProfileHandler(BaseHandler):
     
     async def post(self):
 
-        '''
-        global my_client
-        '''
-
         if self.get_argument("btn1",None) != None:
             print("detektovan klik na btn Profile")
             self.redirect("/profile")
+            return
         
         if self.get_argument("btn2", None) != None:
             print("detektovan klik na btn Sources")
@@ -124,9 +106,6 @@ class ProfileHandler(BaseHandler):
 
         if self.get_argument("logout",None) != None:
             print("unutar if-a logout-a")
-            '''
-            my_client = ''
-            '''
             self.clear_cookie("username")
             self.redirect("/")
             return
@@ -144,10 +123,6 @@ class ProfileHandler(BaseHandler):
             db = self.settings['db']
             collection = db.test
             
-            '''
-            username = my_client['name']
-            password = my_client['password']
-            '''
             username = self.current_user
             headline = dic_data['article']
             id_headline = dic_data['id_article']
@@ -176,10 +151,6 @@ class LoginHandler(BaseHandler):
             print("detektovan klik na btn Sources")
             self.redirect("/sources")
             return
-        '''
-        db = self.settings['db']
-        collection = db.test
-        '''
 
         username = self.get_argument("username")
         password = self.get_argument("password")
@@ -192,14 +163,8 @@ class LoginHandler(BaseHandler):
         print('***'*15)
         print(val)
         print('***'*15)
-        
-        
+                
         if(val!= None):
-            
-            '''
-            global my_client
-            my_client = val
-            '''
 
             self.redirect("/profile")
         else:
@@ -246,12 +211,6 @@ class SigninHandler(BaseHandler):
         self.set_secure_cookie("username", username)
 
         if(val1 != None):
-            '''
-            global my_client
-            #potrazuje upisanog iz baze
-            val = await do_find_one(collection,username,password)
-            my_client = val
-            '''
             self.redirect("/profile")
 
         else:
@@ -283,9 +242,6 @@ class SourceHandler(BaseHandler):
             return
         print('prosao redirect na sources')
             
-        #a=self.get_argument("drzava",None)
-        #print(a)
-
         print('---'*26)
         dic_data = tornado.escape.json_decode(self.request.body)
         print(dic_data)
@@ -348,11 +304,6 @@ class SourceHandler(BaseHandler):
         podaci1 = tornado.escape.json_decode(response1.body)
         pprint.pprint(podaci1)
 
-        '''
-        response3 = requests.get(url)
-        podaci3 = response3.json()
-        print(json.dumps(podaci3, indent=1))'
-        '''
         
         status1 = podaci1['status']
         #print(status3)
@@ -402,23 +353,11 @@ class MainHandler(BaseHandler):
         print(dic_data)
         print('---'*26)
 
-        '''
-        global timer
-        '''
 
         if("headline" in dic_data):
             print("detektovao sam zahtev za cuvanjem jedne vesti")
             db = self.settings['db']
             collection = db.test
-            '''
-            global my_client
-            #print('my_client: '+ my_client)
-
-            if my_client == '':
-                print('my_client je prazno')
-                self.write(json.dumps({'sent': 'redirekt'}))
-                return
-            '''
 
             username = self.current_user
             print(username)
@@ -466,7 +405,6 @@ class MainHandler(BaseHandler):
             print("detektovao sam zahtev za potragom vesi")
 
 
-
             #nakon što sam primio zahtev od klijenta, ovde
             #treba da vratim kontrolu ioloop-u dok potražujem podatke od apija.
             #tek po prispeću podataka od apija, "aktiviram klijenta" šaljući mu odgovor nazad
@@ -475,11 +413,6 @@ class MainHandler(BaseHandler):
             a=dic_data['country']
             b=dic_data['category']
             initial_request = dic_data['initial_request']
-            '''
-            self.xsrf_token = dic_data['_xsrf']
-            print(self.xsrf_token)
-            '''
-
             c=''
 
             if('keyword' in dic_data):
@@ -506,6 +439,7 @@ class MainHandler(BaseHandler):
 
                     v1 = await do_find_one(collection, self.current_user)
                     timer = v1['timer']
+                    print(timer)
 
                 self.sleeping_client = asyncio.sleep(timer)
                 await self.sleeping_client

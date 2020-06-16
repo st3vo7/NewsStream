@@ -2,8 +2,16 @@ $(function () {
   //alert("Ucitana stranica!");
   //console.log('1');
 
+
+  
+  /* napravim globalnu promenljuvu takvu da
+  saljem zahtev - cuvam (azuriram) parametre pretrage
+  dobijem odgovor - brisem parametre pretrage
+  ako primljene vesti != poslednje poslate onda ih ne ispisujem */
+
+
+
   var obj;
-  var initial_request;
   var errorSleepTime = 500;
   var sending_parameters;
   var tmp_list_url = [];
