@@ -50,12 +50,12 @@ $(function () {
     //alert('kliknuto na btnSauce');
     e.preventDefault();
 
-    var $country = $('#group1 :checked');
+    var $country = $('#group1s :checked');
     //alert($country.val());
-    var $category = $('#group2 :checked');
+    var $category = $('#group2s :checked');
     //alert($category.val());
 
-    var $language = $('#group3 :checked');
+    var $language = $('#group3s :checked');
     //alert($language.val());
 
     var package = {
@@ -218,6 +218,18 @@ $(function () {
 
 
     //alert(sending_parameters.initial_request);
+
+    var a = obj.country;
+    var b = obj.category;
+    var c = obj.keyword;
+
+    if(a!= sending_parameters.country || b != sending_parameters.category){
+      return;
+    }
+
+    if(c!='' && c != sending_parameters.keyword){
+      return;
+    }
 
 
     articles = obj.sent.articles;
@@ -536,7 +548,26 @@ $(function () {
     //$('#btnCategory').addClass('dotted_border');
   });
 
-  $('#group3').on('click', function () {
+  $('#group1s').on('click', function () {
+
+    //alert(document.querySelector('input[name="country"]:checked').nextSibling.textContent);
+    $('#btnCountry').text(document.querySelector('input[name="country"]:checked').nextSibling.textContent);
+    // $('#btnCountry').parentElement.addClass('dotted_border');
+
+    $('#btnSend').removeAttr('disabled');
+    $('#btnSources').removeAttr('disabled');
+
+  });
+
+
+  $('#group2s').on('click', function () {
+
+    //alert(document.querySelector('input[name="country"]:checked').nextSibling.textContent);
+    $('#btnCategory').text(document.querySelector('input[name="category"]:checked').nextSibling.textContent);
+    //$('#btnCategory').addClass('dotted_border');
+  });
+
+  $('#group3s').on('click', function () {
 
     //alert(document.querySelector('input[name="country"]:checked').nextSibling.textContent);
     $('#btnLanguage').text(document.querySelector('input[name="language"]:checked').nextSibling.textContent);
