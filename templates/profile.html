@@ -27,20 +27,27 @@
                         
                         <a><input type="radio" id="rfrSixty" name="refreshing" value="3600" class="radio"> 1 hr <br></a>
 
-
                     </fieldset>
 
                 </div>
             </div>
-
-
-
             <a style="float: right;"><input type="submit" class="btn" value="Log Out" name="logout"></a>
 
             <div style="text-align: center; height: 45px;  float: right;">
                 <p class="username">{{ user }}</p>
             </div>
 
+            <div class="dropdown" style="margin-left: 2px;">
+                <button class="dropbtn" id="btnPass" disabled> <i class="fa fa-cog"> </i> </button>
+                <div id="passChange" class="dropdown-content">
+                    <p style="text-align: center; float: center; font-weight:600; ">Change current password here:</p>
+                    <a style="padding: 5px 10px;"><input type="text" name="passOld" id="passOld" autocomplete="off" placeholder="Input current password here"><br></a>
+                    <a style="padding: 5px 10px;"><input type="text" name="passNew1" id="passNew1" autocomplete="off" placeholder="Input new password here"><br></a>
+                    <a style="padding: 5px 10px;"><input type="text" name="passNew2" id="passNew2" autocomplete="off" placeholder="Repeat new password here"><br></a>
+                    <a style="float: right;"><input id="btnPassChange" type="submit" class="btn" value="Change Password" name="passChange"></a>
+                </div>
+
+            </div>
 
         </div>
 

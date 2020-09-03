@@ -51,6 +51,10 @@ async def do_alter_timer(my_collection, name, timer_value):
     result = await my_collection.update_one({"name": name}, {'$set': {"timer": timer_value}})
     return result
 
+async  def do_alter_password(my_collection, name, new_password):
+    result = await  my_collection.update_one({"name": name}, {'$set': {"password": new_password}})
+    return  result
+
 
 class BaseHandler(tornado.web.RequestHandler):
 
@@ -115,11 +119,69 @@ class ProfileHandler(BaseHandler):
             self.clear_cookie("username")
             self.redirect("/")
             return
+        """
+        if self.get_argument("passChange", None) is not None:
+
+            old_password = self.get_argument("passOld")
+            new_passord1 = self.get_argument("passNew1")
+            new_passord2 = self.get_argument("passNew2")
+            print('---' * 26)
+            print(old_password, new_passord1, new_passord2)
+            print('---' * 26)
+
+            if new_passord1 != new_passord2:
+                self.write("<p>Repeated password doesn't match new one!</p>")
+                return
+
+            current_user_data = await do_find_one(collection, self.current_user)
+            current_password = current_user_data['password']
+
+            if old_password != current_password:
+                self.write("<p>Current password doesn't match an input one.</p>")
+                return
+
+            val = await do_alter_password(collection, self.current_user, new_passord1)
+            if val is not None:
+                print('azurirana lozinka')
+            else:
+                print('greska pri azuriranju tajmera')
+            return
+        """
 
         print('---' * 26)
         dic_data = tornado.escape.json_decode(self.request.body)
         print(dic_data)
         print('---' * 26)
+
+        if 'passOld' in dic_data:
+            old_password = dic_data["passOld"]
+            new_passord1 = dic_data["passNew1"]
+            new_passord2 = dic_data["passNew2"]
+            # print('---' * 26)
+            # print(old_password, new_passord1, new_passord2)
+            # print('---' * 26)
+
+            if new_passord1 != new_passord2:
+                self.write(json.dumps({'sent': 'missmatched'}))
+                return
+
+            current_user_data = await do_find_one(collection, self.current_user)
+            current_password = current_user_data['password']
+            print("Current password: ", current_password)
+
+            if old_password != current_password:
+                self.write(json.dumps({'sent': 'current'}))
+                return
+
+            val = await do_alter_password(collection, self.current_user, new_passord1)
+            if val is not None:
+                print('azurirana lozinka')
+                self.write(json.dumps({'sent': 'changed'}))
+                return
+            else:
+                print('greska pri azuriranju tajmera')
+            return
+
 
         if 'article' in dic_data:
             """
@@ -160,17 +222,16 @@ class LoginHandler(BaseHandler):
         username = self.get_argument("username")
         password = self.get_argument("password")
 
-        self.set_secure_cookie("username", username)
-
         val = await do_check_one(collection, username, password)
         print('***' * 15)
         print(val)
         print('***' * 15)
 
         if val is not None:
+            self.set_secure_cookie("username", username)
             self.redirect("/profile")
         else:
-            self.write('<h1>Pogresni kredencijali</h1>')
+            self.write('<h1>Wrong credentials</h1>')
 
 
 class SigninHandler(BaseHandler):
@@ -207,12 +268,11 @@ class SigninHandler(BaseHandler):
         val1 = await do_insert(collection, username, password)
         print("result %s" % repr(val1.inserted_id))
 
-        self.set_secure_cookie("username", username)
-
         if val1 is not None:
+            self.set_secure_cookie("username", username)
             self.redirect("/profile")
         else:
-            print("greska pri upisu u bazu")
+            print("An error occurred while writing into a database.")
 
 
 class SourceHandler(BaseHandler):

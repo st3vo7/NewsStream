@@ -44,6 +44,8 @@ $(function () {
 
   }
 
+  $('#btn')
+
 
 
   $('#btnSources').on('click', function (e) {
@@ -101,8 +103,6 @@ $(function () {
     e.preventDefault();
 
     var package;
-
-
 
     var $country = $('#group1 :checked');
     var $category = $('#group2 :checked');
@@ -376,7 +376,28 @@ $(function () {
     alert('You have successfully changed refreshing timer.');
   }
 
+  function data_ok_password_change(data){
+    obj = JSON.parse(data);
+    //console.log(obj);
+    var rez = obj.sent;
+    //alert(rez);
+
+    if(rez == 'missmatched'){
+        alert("New password doesn't match a repeted one. Please, try again.");
+    }
+    else if(rez == 'current'){
+        alert("Current password doesn't match an input one. Please try again.");
+    }
+    else {
+        alert('You have successfully changed your password.');
+    }
+  }
+
   function data_not_ok_timer(){
+
+  }
+
+  function data_not_ok_password_change(){
 
   }
 
@@ -602,7 +623,7 @@ $(function () {
   $('#timerList').on('click', function(){
 
     var $timer = $('#timerGroup :checked');
-    alert($timer.val())
+    //alert($timer.val())
 
     var package = {};
     package['timer']=$timer.val();
@@ -611,8 +632,24 @@ $(function () {
     //alert(posiljka['timer']);
 
     post_ajax('http://localhost:8000', JSON.stringify(package), data_ok_timer, data_not_ok_timer);
-    
-    
+
+  });
+
+  $('#btnPassChange').on('click', function(e){
+
+    e.preventDefault();
+
+    var $oldPassword = $('#passOld');
+    var $newPassword1 = $('#passNew1');
+    var $newPassword2 = $('#passNew2');
+
+    var package = {};
+    package['passOld']=$oldPassword.val();
+    package['passNew1']=$newPassword1.val();
+    package['passNew2']=$newPassword2.val();
+
+
+    post_ajax('http://localhost:8000/profile', JSON.stringify(package), data_ok_password_change, data_not_ok_password_change);
 
   });
 
