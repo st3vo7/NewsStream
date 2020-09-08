@@ -51,9 +51,10 @@ async def do_alter_timer(my_collection, name, timer_value):
     result = await my_collection.update_one({"name": name}, {'$set': {"timer": timer_value}})
     return result
 
-async  def do_alter_password(my_collection, name, new_password):
-    result = await  my_collection.update_one({"name": name}, {'$set': {"password": new_password}})
-    return  result
+
+async def do_alter_password(my_collection, name, new_password):
+    result = await my_collection.update_one({"name": name}, {'$set': {"password": new_password}})
+    return result
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -61,6 +62,28 @@ class BaseHandler(tornado.web.RequestHandler):
     # ovo mi predlaze tornado za uklanjanje warninga
     def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
         pass
+
+    def prepare(self):
+        if self.get_argument("btn1", None) is not None:
+            print("detektovan klik na btn Profile")
+            self.redirect("/profile")
+            return
+
+        if self.get_argument("btn2", None) is not None:
+            print("detektovan klik na btn Sources")
+            self.redirect("/sources")
+            return
+
+        if self.get_argument("logout", None) is not None:
+            print("unutar if-a logout-a")
+            self.clear_cookie("username")
+            self.redirect("/")
+            return
+
+        if self.get_argument("btnSignIn", None) is not None:
+            print("detektovan klik na btnSignIn")
+            self.redirect("/signin")
+            return
 
     def get_current_user(self):
         a = self.get_secure_cookie("username")
@@ -75,6 +98,31 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class ProfileHandler(BaseHandler):
 
+    def prepare(self):
+        super().prepare()
+        """
+        if self.get_argument("btn1", None) is not None:
+            print("detektovan klik na btn Profile")
+            self.redirect("/profile")
+            return
+
+        if self.get_argument("btn2", None) is not None:
+            print("detektovan klik na btn Sources")
+            self.redirect("/sources")
+            return
+
+        if self.get_argument("logout", None) is not None:
+            print("unutar if-a logout-a")
+            self.clear_cookie("username")
+            self.redirect("/")
+            return
+        
+        if self.get_argument("btnSignIn", None) is not None:
+            print("detektovan klik na btnSignIn")
+            self.redirect("/signin")
+            return
+        """
+
     @tornado.web.authenticated
     async def get(self):
 
@@ -83,10 +131,8 @@ class ProfileHandler(BaseHandler):
         my_collection = my_db.test
         """
         username = self.current_user
-
-        print(username)
+        # print(username)
         # print("username: " + username)
-
         # nadji ga u bazi
         v1 = await do_find_one(collection, username)
         # pprint.pprint(v1)
@@ -104,64 +150,20 @@ class ProfileHandler(BaseHandler):
 
     async def post(self):
 
-        if self.get_argument("btn1", None) is not None:
-            print("detektovan klik na btn Profile")
-            self.redirect("/profile")
-            return
-
-        if self.get_argument("btn2", None) is not None:
-            print("detektovan klik na btn Sources")
-            self.redirect("/sources")
-            return
-
-        if self.get_argument("logout", None) is not None:
-            print("unutar if-a logout-a")
-            self.clear_cookie("username")
-            self.redirect("/")
-            return
-        """
-        if self.get_argument("passChange", None) is not None:
-
-            old_password = self.get_argument("passOld")
-            new_passord1 = self.get_argument("passNew1")
-            new_passord2 = self.get_argument("passNew2")
-            print('---' * 26)
-            print(old_password, new_passord1, new_passord2)
-            print('---' * 26)
-
-            if new_passord1 != new_passord2:
-                self.write("<p>Repeated password doesn't match new one!</p>")
-                return
-
-            current_user_data = await do_find_one(collection, self.current_user)
-            current_password = current_user_data['password']
-
-            if old_password != current_password:
-                self.write("<p>Current password doesn't match an input one.</p>")
-                return
-
-            val = await do_alter_password(collection, self.current_user, new_passord1)
-            if val is not None:
-                print('azurirana lozinka')
-            else:
-                print('greska pri azuriranju tajmera')
-            return
-        """
-
         print('---' * 26)
         dic_data = tornado.escape.json_decode(self.request.body)
-        print(dic_data)
+        # print(dic_data)
         print('---' * 26)
 
         if 'passOld' in dic_data:
             old_password = dic_data["passOld"]
-            new_passord1 = dic_data["passNew1"]
-            new_passord2 = dic_data["passNew2"]
+            new_password1 = dic_data["passNew1"]
+            new_password2 = dic_data["passNew2"]
             # print('---' * 26)
-            # print(old_password, new_passord1, new_passord2)
+            # print(old_password, new_password1, new_password2)
             # print('---' * 26)
 
-            if new_passord1 != new_passord2:
+            if new_password1 != new_password2:
                 self.write(json.dumps({'sent': 'missmatched'}))
                 return
 
@@ -173,7 +175,7 @@ class ProfileHandler(BaseHandler):
                 self.write(json.dumps({'sent': 'current'}))
                 return
 
-            val = await do_alter_password(collection, self.current_user, new_passord1)
+            val = await do_alter_password(collection, self.current_user, new_password1)
             if val is not None:
                 print('azurirana lozinka')
                 self.write(json.dumps({'sent': 'changed'}))
@@ -181,7 +183,6 @@ class ProfileHandler(BaseHandler):
             else:
                 print('greska pri azuriranju tajmera')
             return
-
 
         if 'article' in dic_data:
             """
@@ -202,13 +203,9 @@ class LoginHandler(BaseHandler):
     def get(self):
         self.render('login.html')
 
-    async def post(self):
-
-        if self.get_argument("btnSignIn", None) is not None:
-            print("detektovan klik na btnSignIn")
-            self.redirect("/signin")
-            return
-
+    def prepare(self):
+        super().prepare()
+        """
         if self.get_argument("btn1", None) is not None:
             print("detektovan klik na btn Profile")
             self.redirect("/profile")
@@ -218,6 +215,14 @@ class LoginHandler(BaseHandler):
             print("detektovan klik na btn Sources")
             self.redirect("/sources")
             return
+
+        if self.get_argument("btnSignIn", None) is not None:
+            print("detektovan klik na btnSignIn")
+            self.redirect("/signin")
+            return
+        """
+
+    async def post(self):
 
         username = self.get_argument("username")
         password = self.get_argument("password")
@@ -238,8 +243,9 @@ class SigninHandler(BaseHandler):
     def get(self):
         self.render('signin.html')
 
-    async def post(self):
-
+    def prepare(self):
+        super().prepare()
+        """
         if self.get_argument("btn1", None) is not None:
             print("detektovan klik na btn Profile")
             self.redirect("/profile")
@@ -249,6 +255,9 @@ class SigninHandler(BaseHandler):
             print("detektovan klik na btn Sources")
             self.redirect("/sources")
             return
+        """
+
+    async def post(self):
 
         """
         my_db = self.settings['db']
@@ -256,8 +265,14 @@ class SigninHandler(BaseHandler):
         """
 
         username = self.get_argument("username")
+        print(username)
         password = self.get_argument("password")
+        print(password)
         # email = self.get_argument("email")
+
+        if username == '' or password == '':
+            self.write('Username and password must not be empty strings.')
+            return
 
         val = await do_find_one(collection, username)
 
@@ -281,19 +296,23 @@ class SourceHandler(BaseHandler):
         self.render("sources.html",
                     )
 
-    async def post(self):
-        print('u postu sam')
-
+    def prepare(self):
+        super().prepare()
+        """
         if self.get_argument("btn1", None) is not None:
+            print("detektovan klik na btn Profile")
             self.redirect("/profile")
             return
-        print('prosao redirect na profile')
 
         if self.get_argument("btn2", None) is not None:
+            print("detektovan klik na btn Sources")
             self.redirect("/sources")
             return
-        print('prosao redirect na sources')
+        """
 
+    async def post(self):
+
+        print('u postu sam')
         print('---' * 26)
         dic_data = tornado.escape.json_decode(self.request.body)
         print(dic_data)
@@ -334,8 +353,11 @@ class SourceHandler(BaseHandler):
                 v1 = await do_find_one(collection, self.current_user)
                 timer = v1['timer']
 
-            self.sleeping_client = asyncio.sleep(timer)
-            await self.sleeping_client
+            try:
+                await asyncio.sleep(timer)
+            except asyncio.CancelledError:
+                print('uspavani klijent je prekinuo konekciju')
+                raise
             print('gotovo cekanje')
 
         url = ('https://newsapi.org/v2/sources?'
@@ -367,10 +389,15 @@ class SourceHandler(BaseHandler):
 
     def on_connection_close(self):
 
-        print('***' * 15)
-        asyncio.ensure_future(self.sleeping_client).cancel()
-        print("A client has left the room.")
-        print('***' * 15)
+        try:
+            print('***' * 15)
+            asyncio.ensure_future(self.post()).cancel()
+            print("A client has left the room.")
+            print('***' * 15)
+
+        except Exception as e:
+            print("An error occurred: %s" % e)
+            raise e
 
 
 class MainHandler(BaseHandler):
@@ -379,19 +406,25 @@ class MainHandler(BaseHandler):
         self.render("index.html",
                     )
 
-    async def post(self):
-        print('u postu sam')
+    def prepare(self):
 
-        if self.get_argument("btn2", None) is not None:
-            self.redirect("/sources")
-            return
-        print('prosao redirect na sauces')
-
+        # print('U priperu sam')
+        super().prepare()
+        """
         if self.get_argument("btn1", None) is not None:
+            print("detektovan klik na btn Profile")
             self.redirect("/profile")
             return
-        print('prosao redirect na profile')
 
+        if self.get_argument("btn2", None) is not None:
+            print("detektovan klik na btn Sources")
+            self.redirect("/sources")
+            return
+        """
+
+    async def post(self):
+
+        print('u postu sam')
         # ovde treba da proverim da li sam dobio zahtev za vešću
         # ili zahtev za čuvanjem vesti
 
@@ -489,9 +522,12 @@ class MainHandler(BaseHandler):
                     timer = v1['timer']
                     print(timer)
 
-                self.sleeping_client = asyncio.sleep(timer)
-                await self.sleeping_client
-                print("okay done now")
+                try:
+                    await asyncio.sleep(timer)
+                except asyncio.CancelledError as e:
+                    raise e
+                finally:
+                    print("okay done now1")
 
             url = ('https://newsapi.org/v2/top-headlines?'
                    'country=' + a + '&'
@@ -540,23 +576,20 @@ class MainHandler(BaseHandler):
         if you need to do cleanup after every request override on_finish instead.
         """
 
-        # nije response1, jer je to odgovor od API-ja
-        # meni treba da obradim slucaj kada klijent zatvori tab
-        # self.response1.cancel()
-        # self.sleeping_client.cancel()
+        # print(asyncio.isfuture(self.sleeping_client))  # False
+        # print(asyncio.iscoroutine(self.sleeping_client)) # True
+        # print(asyncio.isfuture(asyncio.ensure_future(self.sleeping_client))) # True
 
-        # print(asyncio.isfuture(self.sleeping_client))
-        # print(asyncio.iscoroutine(self.sleeping_client))
-        # print(asyncio.isfuture(asyncio.ensure_future(self.sleeping_client)))
 
         try:
             print('***' * 15)
-            asyncio.ensure_future(self.sleeping_client).cancel()
+            asyncio.ensure_future(self.post()).cancel()
             print("A client has left the room.")
             print('***' * 15)
 
-        except asyncio.CancelledError as e:
+        except Exception as e:
             print("An error occurred: %s" % e)
+            raise e
 
 
 if __name__ == '__main__':
@@ -589,4 +622,7 @@ if __name__ == '__main__':
     )
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(options.port)
-    tornado.ioloop.IOLoop.instance().start()
+    try:
+        tornado.ioloop.IOLoop.instance().start()
+    except KeyboardInterrupt:
+        print('Server has shut down.')
