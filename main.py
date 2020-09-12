@@ -615,7 +615,8 @@ if __name__ == '__main__':
                   (r'/sources', SourceHandler),
                   (r'/login', LoginHandler),
                   (r'/signin', SigninHandler),
-                  (r'/profile', ProfileHandler)
+                  (r'/profile', ProfileHandler),
+                  (r'/favicon.ico', tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
                   ],
         **settings
 
