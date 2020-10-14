@@ -9,11 +9,11 @@ Home page
 <img src="https://raw.githubusercontent.com/st3vo7/NewsStream/master/Examples/home.png" alt="NewsStream banner" align="center" />
 <br>
 
-Sources
+Sources page
 <img src="https://raw.githubusercontent.com/st3vo7/NewsStream/master/Examples/sources.png" alt="NewsStream banner" align="center" />
 <br>
 
-Home
-<img src="https://raw.githubusercontent.com/st3vo7/NewsStream/master/Examples/home.png" alt="NewsStream banner" align="center" />
+Profile page
+<img src="https://raw.githubusercontent.com/st3vo7/NewsStream/master/Examples/profile.png" alt="NewsStream banner" align="center" />
 <br>
 
