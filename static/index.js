@@ -382,8 +382,8 @@ $(function () {
     var rez = obj.sent;
     //alert(rez);
 
-    if(rez == 'missmatched'){
-        alert("New password doesn't match a repeted one. Please, try again.");
+    if(rez == 'mismatched'){
+        alert("New password doesn't match a repeated one. Please, try again.");
     }
     else if(rez == 'current'){
         alert("Current password doesn't match an input one. Please try again.");

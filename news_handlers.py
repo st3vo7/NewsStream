@@ -1,8 +1,6 @@
-import os.path
 import json
 import pprint
 import asyncio
-from typing import Optional, Awaitable
 
 import tornado.httpserver
 import tornado.ioloop
@@ -11,202 +9,10 @@ import tornado.web
 import tornado.escape
 import tornado.httpclient
 
-import motor.motor_tornado
-
-from tornado.options import define, options
-
-from user_handlers import *
-from news_handlers import *
+from base_handler import *
+from db_manip import *
 
 
-define("port", default=8000, help="run on the given port", type=int)
-
-'''
-class BaseHandler(tornado.web.RequestHandler):
-
-    # suggested by pycharm for warning repression
-    def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
-        pass
-
-    def prepare(self):
-        if self.get_argument("btn1", None) is not None:
-            print("detected click on btn Profile")
-            self.redirect("/profile")
-            return
-
-        if self.get_argument("btn2", None) is not None:
-            print("detected click on btn Sources")
-            self.redirect("/sources")
-            return
-
-        if self.get_argument("logout", None) is not None:
-            print("unutar if-a logout-a")
-            self.clear_cookie("username")
-            self.redirect("/")
-            return
-
-        if self.get_argument("btnSignIn", None) is not None:
-            print("detected click on btnSignIn")
-            self.redirect("/signin")
-            return
-
-    def get_current_user(self):
-        a = self.get_secure_cookie("username")
-
-        if a:
-            print('***' * 15)
-            print(a.decode("utf-8"))
-            print('***' * 15)
-            return a.decode("utf-8")
-        return None
-
-
-
-class ProfileHandler(BaseHandler):
-
-    def prepare(self):
-        super().prepare()
-
-    @tornado.web.authenticated
-    async def get(self):
-
-        """
-        my_db = self.settings['db']
-        my_collection = my_db.test
-        """
-        username = self.current_user
-        # print(username)
-        # print("username: " + username)
-        # find him in db
-        v1 = await do_find_one(collection, username)
-        # pprint.pprint(v1)
-
-        if v1 is not None:
-
-            # izvuci njegove vesti i renderuj ih na stranici
-            headlines = v1['headlines']
-            # pprint.pprint(headlines)
-
-            await self.render('profile.html', user=self.current_user, headlines=headlines)
-
-        else:
-            print('Unknown client.')
-
-    async def post(self):
-
-        print('---' * 26)
-        dic_data = tornado.escape.json_decode(self.request.body)
-        # print(dic_data)
-        print('---' * 26)
-
-        if 'passOld' in dic_data:
-            old_password = dic_data["passOld"]
-            new_password1 = dic_data["passNew1"]
-            new_password2 = dic_data["passNew2"]
-
-            if new_password1 != new_password2:
-                self.write(json.dumps({'sent': 'mismatched'}))
-                return
-
-            current_user_data = await do_find_one(collection, self.current_user)
-            current_password = current_user_data['password']
-            print("Current password: ", current_password)
-
-            if old_password != current_password:
-                self.write(json.dumps({'sent': 'current'}))
-                return
-
-            val = await do_alter_password(collection, self.current_user, new_password1)
-            if val is not None:
-                print('Password updated.')
-                self.write(json.dumps({'sent': 'changed'}))
-                return
-            else:
-                print('An error occurred while adjusting the timer')
-            return
-
-        if 'article' in dic_data:
-            """
-            my_db = self.settings['db']
-            my_collection = my_db.test
-            """
-
-            username = self.current_user
-            headline = dic_data['article']
-            id_headline = dic_data['id_article']
-
-            v1 = await do_delete_one(collection, username, headline)
-            print("result %s" % repr(v1))
-            self.write(json.dumps({'sent': id_headline}))
-'''
-
-'''
-class LoginHandler(BaseHandler):
-    def get(self):
-        self.render('login.html')
-
-    def prepare(self):
-        super().prepare()
-
-    async def post(self):
-
-        username = self.get_argument("username")
-        password = self.get_argument("password")
-
-        val = await do_check_one(collection, username, password)
-        print('***' * 15)
-        print(val)
-        print('***' * 15)
-
-        if val is not None:
-            self.set_secure_cookie("username", username)
-            self.redirect("/profile")
-        else:
-            self.write('<h1>Wrong credentials</h1>')
-
-
-class SigninHandler(BaseHandler):
-    def get(self):
-        self.render('signin.html')
-
-    def prepare(self):
-        super().prepare()
-
-    async def post(self):
-
-        """
-        my_db = self.settings['db']
-        my_collection = my_db.test
-        """
-
-        username = self.get_argument("username")
-        print(username)
-        password = self.get_argument("password")
-        print(password)
-        # email = self.get_argument("email")
-
-        if username == '' or password == '':
-            self.write('Username and password must not be empty strings.')
-            return
-
-        val = await do_find_one(collection, username)
-
-        if val:
-            self.write('Username already exists. Please choose other one.')
-            return
-
-        val1 = await do_insert(collection, username, password)
-        print("result %s" % repr(val1.inserted_id))
-
-        if val1 is not None:
-            self.set_secure_cookie("username", username)
-            self.redirect("/profile")
-        else:
-            print("An error occurred while writing into a database.")
-'''
-
-
-'''
 class SourceHandler(BaseHandler):
 
     def get(self):
@@ -251,10 +57,8 @@ class SourceHandler(BaseHandler):
                 # dakle ulogovan je, onda citaj tajmer iz baze
                 # inace je 600
 
-                """
                 my_db = self.settings['db']
-                my_collection = my_db.test
-                """
+                collection = my_db.test
 
                 v1 = await do_find_one(collection, self.current_user)
                 timer = v1['timer']
@@ -332,10 +136,8 @@ class MainHandler(BaseHandler):
         if "headline" in dic_data:
             print("Detected request for saving a news.")
 
-            """
             my_db = self.settings['db']
-            my_collection = my_db.test
-            """
+            collection = my_db.test
 
             username = self.current_user
             print(username)
@@ -363,10 +165,8 @@ class MainHandler(BaseHandler):
 
         elif 'timer' in dic_data:
             # print(dic_data['timer'])
-            """
             my_db = self.settings['db']
-            my_collection = my_db.test
-            """
+            collection = my_db.test
 
             timer = int(dic_data['timer'])
 
@@ -408,10 +208,8 @@ class MainHandler(BaseHandler):
                 if self.current_user is not None:
                     # dakle ulogovan je, onda citaj tajmer iz baze
                     # inace je 600
-                    """
                     my_db = self.settings['db']
-                    my_collection = my_db.test
-                    """
+                    collection = my_db.test
 
                     v1 = await do_find_one(collection, self.current_user)
                     timer = v1['timer']
@@ -480,40 +278,3 @@ class MainHandler(BaseHandler):
         except Exception as e:
             print("An error occurred: %s" % e)
             raise e
-'''
-
-if __name__ == '__main__':
-    tornado.options.parse_command_line()
-
-    client = motor.motor_tornado.MotorClient('localhost', 27017)
-    db = client.test
-    collection = db.test
-
-    settings = {
-        "template_path": os.path.join(os.path.dirname(__file__), "templates"),
-        "static_path": os.path.join(os.path.dirname(__file__), "static"),
-        "cookie_secret": "s8iJWyTeSQ+Hfgj59nTy4bFKahPdAEnbhsH5CRuUN1g=",
-        "login_url": "/login",
-        "db": db,
-        "debug": True,
-        "xsrf_cookies": True
-
-    }
-
-    app = tornado.web.Application(
-        handlers=[(r'/', MainHandler),
-                  (r'/sources', SourceHandler),
-                  (r'/login', LoginHandler),
-                  (r'/signin', SigninHandler),
-                  (r'/profile', ProfileHandler),
-                  (r'/favicon.ico', tornado.web.StaticFileHandler, dict(path=settings['static_path'])),
-                  ],
-        **settings
-
-    )
-    http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(options.port)
-    try:
-        tornado.ioloop.IOLoop.instance().start()
-    except KeyboardInterrupt:
-        print('Server has shut down.')
