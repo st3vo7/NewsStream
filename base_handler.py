@@ -2,7 +2,6 @@ import tornado.web
 from typing import Optional, Awaitable
 
 
-
 class BaseHandler(tornado.web.RequestHandler):
 
     # suggested by pycharm for warning repression
